@@ -107,7 +107,7 @@ namespace FortyOne.AudioSwitcher
             get
             {
                 if (listBoxPlayback.SelectedItems.Count > 0)
-                    return ((IDevice)listBoxPlayback.SelectedItems[0].Tag);
+                    return listBoxPlayback.SelectedItems[0].Tag as IDevice;
                 return null;
             }
         }
@@ -117,7 +117,7 @@ namespace FortyOne.AudioSwitcher
             get
             {
                 if (listBoxRecording.SelectedItems.Count > 0)
-                    return ((IDevice)listBoxRecording.SelectedItems[0].Tag);
+                    return listBoxRecording.SelectedItems[0].Tag as IDevice;
                 return null;
             }
         }
@@ -453,6 +453,7 @@ namespace FortyOne.AudioSwitcher
                 {
                     var currentDefault = AudioDeviceManager.Controller.DefaultPlaybackDevice;
                     var playbackDevices = (await AudioDeviceManager.Controller.GetPlaybackDevicesAsync(DeviceState.Active))
+                                            .Where(x => !HiddenDeviceManager.IsHiddenDevice(x))
                                             .OrderBy(x => x.Name)
                                             .ToList();
 
@@ -778,6 +779,7 @@ namespace FortyOne.AudioSwitcher
 	        chkShowUnknownDevicesInHotkeyList.Checked = Program.Settings.ShowUnknownDevicesInHotkeyList;
             chkShowDisconnectedDevices.Checked = Program.Settings.ShowDisconnectedDevices;
             chkShowDPDeviceIconInTray.Checked = Program.Settings.ShowDPDeviceIconInTray;
+            chkForceAppsFollowDefault.Checked = Program.Settings.ForceAppsFollowDefault;
 
             Width = Program.Settings.WindowWidth;
             Height = Program.Settings.WindowHeight;
@@ -788,6 +790,18 @@ namespace FortyOne.AudioSwitcher
                 StringSplitOptions.RemoveEmptyEntries);
 
             FavouriteDeviceManager.LoadFavouriteDevices(Array.ConvertAll(favDeviceStr, x =>
+            {
+                var r = new Regex(ConfigurationSettings.GUID_REGEX);
+                foreach (var match in r.Matches(x))
+                    return new Guid(match.ToString());
+
+                return Guid.Empty;
+            }));
+
+            var hiddenDeviceStr = Program.Settings.HiddenDevices.Split(new[] { ",", "[", "]" },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            HiddenDeviceManager.LoadHiddenDevices(Array.ConvertAll(hiddenDeviceStr, x =>
             {
                 var r = new Regex(ConfigurationSettings.GUID_REGEX);
                 foreach (var match in r.Matches(x))
@@ -817,33 +831,64 @@ namespace FortyOne.AudioSwitcher
         {
             listBoxPlayback.SuspendLayout();
             listBoxPlayback.Items.Clear();
-            foreach (var ad in AudioDeviceManager.Controller.GetPlaybackDevices(_deviceStateFilter).ToList())
+
+            var allDevices = AudioDeviceManager.Controller.GetPlaybackDevices(_deviceStateFilter).ToList();
+            var visibleDevices = allDevices.Where(d => !HiddenDeviceManager.IsHiddenDevice(d)).ToList();
+            var hiddenDevices = allDevices.Where(d => HiddenDeviceManager.IsHiddenDevice(d)).ToList();
+
+            foreach (var ad in visibleDevices)
+                listBoxPlayback.Items.Add(BuildDeviceListItem(ad, false));
+
+            if (hiddenDevices.Count > 0)
             {
-                var li = new ListViewItem();
-                li.Text = ad.Name;
-                li.Tag = ad;
-                li.SubItems.Add(new ListViewItem.ListViewSubItem(li, ad.InterfaceName));
-                try
+                var separator = new ListViewItem("─── Hidden ───");
+                separator.Tag = null;
+                separator.ForeColor = SystemColors.GrayText;
+                separator.SubItems.Add("");
+                separator.SubItems.Add("");
+                listBoxPlayback.Items.Add(separator);
+
+                foreach (var ad in hiddenDevices)
+                    listBoxPlayback.Items.Add(BuildDeviceListItem(ad, true));
+            }
+
+            RefreshNotifyIconItems();
+            listBoxPlayback.ResumeLayout();
+        }
+
+        private ListViewItem BuildDeviceListItem(IDevice ad, bool isHidden)
+        {
+            var li = new ListViewItem();
+            li.Text = ad.Name;
+            li.Tag = ad;
+            li.SubItems.Add(new ListViewItem.ListViewSubItem(li, ad.InterfaceName));
+
+            if (isHidden)
+                li.ForeColor = SystemColors.GrayText;
+
+            try
+            {
+                var imageKey = "";
+                var imageMod = "";
+
+                if (ICON_MAP.ContainsKey(ad.Icon))
+                    imageKey = ICON_MAP[ad.Icon];
+
+                if (!isHidden && ad.IsDefaultDevice)
                 {
-                    var imageKey = "";
-                    var imageMod = "";
-
-                    if (ICON_MAP.ContainsKey(ad.Icon))
-                        imageKey = ICON_MAP[ad.Icon];
-
-                    if (ad.IsDefaultDevice)
+                    li.SubItems.Add(new ListViewItem.ListViewSubItem(li, "Default Device"));
+                    li.EnsureVisible();
+                }
+                else if (!isHidden && ad.IsDefaultCommunicationsDevice)
+                {
+                    li.SubItems.Add(new ListViewItem.ListViewSubItem(li, "Default Communications Device"));
+                    li.EnsureVisible();
+                }
+                else
+                {
+                    var caption = isHidden ? "Hidden" : "";
+                    if (!isHidden)
                     {
-                        li.SubItems.Add(new ListViewItem.ListViewSubItem(li, "Default Device"));
-                        li.EnsureVisible();
-                    }
-                    else if (ad.IsDefaultCommunicationsDevice)
-                    {
-                        li.SubItems.Add(new ListViewItem.ListViewSubItem(li, "Default Communications Device"));
-                        li.EnsureVisible();
-                    }
-                    else
-                    {
-                        var caption = "";
                         switch (ad.State)
                         {
                             case DeviceState.Active:
@@ -858,70 +903,54 @@ namespace FortyOne.AudioSwitcher
                                 imageMod += "d";
                                 break;
                         }
-                        li.SubItems.Add(new ListViewItem.ListViewSubItem(li, caption));
                     }
-
-                    if (ad.State != DeviceState.Unplugged && FavouriteDeviceManager.IsFavouriteDevice(ad))
-                    {
-                        imageMod += "f";
-                    }
-
-                    if (ad.IsDefaultDevice)
-                    {
-                        imageMod += "e";
-                    }
-                    else if (ad.IsDefaultCommunicationsDevice)
-                    {
-                        imageMod += "c";
-                    }
-
-                    var imageToGen = imageKey + imageMod;
-
-                    if (!imageList1.Images.Keys.Contains(imageToGen))
-                    {
-                        Image i;
-                        using (var icon = ExtractIconFromPath(ad.IconPath))
-                        {
-                            i = icon.ToBitmap();
-                        }
-
-                        if (ad.State == DeviceState.Disabled || ad.State == DeviceState.Unplugged)
-                            i = ImageHelper.SetImageOpacity(i, 0.5F);
-
-                        using (var g = Graphics.FromImage(i))
-                        {
-                            if (imageMod.Contains("f"))
-                            {
-                                g.DrawImage(Resources.f, i.Width - 12, 0);
-                            }
-
-                            if (imageMod.Contains("c"))
-                            {
-                                g.DrawImage(Resources.c, i.Width - 12, i.Height - 12);
-                            }
-
-                            if (imageMod.Contains("e"))
-                            {
-                                g.DrawImage(Resources.e, i.Width - 12, i.Height - 12);
-                            }
-                        }
-
-                        imageList1.Images.Add(imageToGen, i);
-                    }
-
-                    if (imageList1.Images.IndexOfKey(imageToGen) >= 0)
-                        li.ImageKey = imageToGen;
+                    li.SubItems.Add(new ListViewItem.ListViewSubItem(li, caption));
                 }
-                catch
+
+                if (!isHidden && ad.State != DeviceState.Unplugged && FavouriteDeviceManager.IsFavouriteDevice(ad))
+                    imageMod += "f";
+
+                if (!isHidden && ad.IsDefaultDevice)
+                    imageMod += "e";
+                else if (!isHidden && ad.IsDefaultCommunicationsDevice)
+                    imageMod += "c";
+
+                if (isHidden)
+                    imageMod += "d"; // reuse greyed-out appearance for hidden devices
+
+                var imageToGen = imageKey + imageMod;
+
+                if (!imageList1.Images.Keys.Contains(imageToGen))
                 {
-                    li.ImageKey = "unknown";
+                    Image img;
+                    using (var icon = ExtractIconFromPath(ad.IconPath))
+                        img = icon.ToBitmap();
+
+                    if (isHidden || ad.State == DeviceState.Disabled || ad.State == DeviceState.Unplugged)
+                        img = ImageHelper.SetImageOpacity(img, 0.5F);
+
+                    using (var g = Graphics.FromImage(img))
+                    {
+                        if (imageMod.Contains("f"))
+                            g.DrawImage(Resources.f, img.Width - 12, 0);
+                        if (imageMod.Contains("c"))
+                            g.DrawImage(Resources.c, img.Width - 12, img.Height - 12);
+                        if (imageMod.Contains("e"))
+                            g.DrawImage(Resources.e, img.Width - 12, img.Height - 12);
+                    }
+
+                    imageList1.Images.Add(imageToGen, img);
                 }
 
-                listBoxPlayback.Items.Add(li);
+                if (imageList1.Images.IndexOfKey(imageToGen) >= 0)
+                    li.ImageKey = imageToGen;
+            }
+            catch
+            {
+                li.ImageKey = "unknown";
             }
 
-            RefreshNotifyIconItems();
-            listBoxPlayback.ResumeLayout();
+            return li;
         }
 
         private static Icon ExtractIconFromPath(string path)
@@ -950,107 +979,24 @@ namespace FortyOne.AudioSwitcher
             listBoxRecording.SuspendLayout();
             listBoxRecording.Items.Clear();
 
-            foreach (var ad in AudioDeviceManager.Controller.GetCaptureDevices(_deviceStateFilter).ToList())
+            var allDevices = AudioDeviceManager.Controller.GetCaptureDevices(_deviceStateFilter).ToList();
+            var visibleDevices = allDevices.Where(d => !HiddenDeviceManager.IsHiddenDevice(d)).ToList();
+            var hiddenDevices = allDevices.Where(d => HiddenDeviceManager.IsHiddenDevice(d)).ToList();
+
+            foreach (var ad in visibleDevices)
+                listBoxRecording.Items.Add(BuildDeviceListItem(ad, false));
+
+            if (hiddenDevices.Count > 0)
             {
-                var li = new ListViewItem();
-                li.Text = ad.Name;
-                li.Tag = ad;
-                li.SubItems.Add(new ListViewItem.ListViewSubItem(li, ad.InterfaceName));
-                try
-                {
-                    var imageKey = "";
-                    var imageMod = "";
-                    if (ICON_MAP.ContainsKey(ad.Icon))
-                        imageKey = ICON_MAP[ad.Icon];
+                var separator = new ListViewItem("─── Hidden ───");
+                separator.Tag = null;
+                separator.ForeColor = SystemColors.GrayText;
+                separator.SubItems.Add("");
+                separator.SubItems.Add("");
+                listBoxRecording.Items.Add(separator);
 
-                    if (ad.IsDefaultDevice)
-                    {
-                        li.SubItems.Add(new ListViewItem.ListViewSubItem(li, "Default Device"));
-                        li.EnsureVisible();
-                    }
-                    else if (ad.IsDefaultCommunicationsDevice)
-                    {
-                        li.SubItems.Add(new ListViewItem.ListViewSubItem(li, "Default Communications Device"));
-                        li.EnsureVisible();
-                    }
-                    else
-                    {
-                        var caption = "";
-                        switch (ad.State)
-                        {
-                            case DeviceState.Active:
-                                caption = "Ready";
-                                break;
-                            case DeviceState.Disabled:
-                                caption = "Disabled";
-                                imageMod += "d";
-                                break;
-                            case DeviceState.Unplugged:
-                                caption = "Not Plugged In";
-                                imageMod += "d";
-                                break;
-                        }
-                        li.SubItems.Add(new ListViewItem.ListViewSubItem(li, caption));
-                    }
-
-
-                    if (ad.State != DeviceState.Unplugged && FavouriteDeviceManager.IsFavouriteDevice(ad))
-                    {
-                        imageMod += "f";
-                    }
-
-                    if (ad.IsDefaultDevice)
-                    {
-                        imageMod += "e";
-                    }
-                    else if (ad.IsDefaultCommunicationsDevice)
-                    {
-                        imageMod += "c";
-                    }
-
-                    var imageToGen = imageKey + imageMod;
-
-                    if (!imageList1.Images.Keys.Contains(imageToGen))
-                    {
-                        Image i;
-                        using (var icon = ExtractIconFromPath(ad.IconPath))
-                        {
-                            i = icon.ToBitmap();
-                        }
-
-                        if (ad.State.HasFlag(DeviceState.Disabled) || ad.State == DeviceState.Unplugged)
-                            i = ImageHelper.SetImageOpacity(i, 0.5F);
-
-                        using (var g = Graphics.FromImage(i))
-                        {
-                            if (imageMod.Contains("f"))
-                            {
-                                g.DrawImage(Resources.f, i.Width - 12, 0);
-                            }
-
-                            if (imageMod.Contains("c"))
-                            {
-                                g.DrawImage(Resources.c, i.Width - 12, i.Height - 12);
-                            }
-
-                            if (imageMod.Contains("e"))
-                            {
-                                g.DrawImage(Resources.e, i.Width - 12, i.Height - 12);
-                            }
-                        }
-
-                        imageList1.Images.Add(imageToGen, i);
-                    }
-
-                    if (imageList1.Images.IndexOfKey(imageToGen) >= 0)
-                        li.ImageKey = imageToGen;
-                }
-                catch
-                {
-                    li.ImageKey = "unknown";
-                }
-
-                listBoxRecording.Items.Add(li);
+                foreach (var ad in hiddenDevices)
+                    listBoxRecording.Items.Add(BuildDeviceListItem(ad, true));
             }
 
             RefreshNotifyIconItems();
@@ -1068,6 +1014,9 @@ namespace FortyOne.AudioSwitcher
 
             foreach (var ad in list)
             {
+                if (HiddenDeviceManager.IsHiddenDevice(ad))
+                    continue;
+
                 if (FavouriteDeviceManager.FavouriteDeviceCount > 0 && !FavouriteDeviceManager.IsFavouriteDevice(ad))
                     continue;
 
@@ -1089,6 +1038,9 @@ namespace FortyOne.AudioSwitcher
 
             foreach (var ad in list)
             {
+                if (HiddenDeviceManager.IsHiddenDevice(ad))
+                    continue;
+
                 if (FavouriteDeviceManager.FavouriteDeviceCount > 0 && !FavouriteDeviceManager.IsFavouriteDevice(ad))
                     continue;
 
@@ -1171,6 +1123,10 @@ namespace FortyOne.AudioSwitcher
                 ? CheckState.Checked
                 : CheckState.Unchecked;
 
+            mnuHidePlaybackDevice.Text = HiddenDeviceManager.IsHiddenDevice(SelectedPlaybackDevice.Id)
+                ? "Unhide Device"
+                : "Hide Device";
+
             if (SelectedPlaybackDevice.State == DeviceState.Unplugged)
             {
                 btnSetPlaybackDefault.Enabled = false;
@@ -1208,6 +1164,10 @@ namespace FortyOne.AudioSwitcher
                 ? CheckState.Checked
                 : CheckState.Unchecked;
 
+            mnuHideRecordingDevice.Text = HiddenDeviceManager.IsHiddenDevice(SelectedRecordingDevice.Id)
+                ? "Unhide Device"
+                : "Hide Device";
+
             if (SelectedRecordingDevice.State == DeviceState.Unplugged)
             {
                 btnSetRecordingDefault.Enabled = false;
@@ -1242,11 +1202,14 @@ namespace FortyOne.AudioSwitcher
 
         private void PostPlaybackMenuClick(Guid id)
         {
+            if (Program.Settings.ForceAppsFollowDefault)
+                AppAudioRouter.ClearPersistedEndpoints();
+
             RefreshPlaybackDevices();
             RefreshPlaybackDropDownButton();
             for (var i = 0; i < listBoxPlayback.Items.Count; i++)
             {
-                if (((IDevice)listBoxPlayback.Items[i].Tag).Id == id)
+                if (listBoxPlayback.Items[i].Tag is IDevice dev && dev.Id == id)
                 {
                     listBoxPlayback.Items[i].Selected = true;
                     break;
@@ -1266,11 +1229,14 @@ namespace FortyOne.AudioSwitcher
 
         private void PostRecordingMenuClick(Guid id)
         {
+            if (Program.Settings.ForceAppsFollowDefault)
+                AppAudioRouter.ClearPersistedEndpoints();
+
             RefreshRecordingDevices();
             RefreshRecordingDropDownButton();
             for (var i = 0; i < listBoxRecording.Items.Count; i++)
             {
-                if (((IDevice)listBoxRecording.Items[i].Tag).Id == id)
+                if (listBoxRecording.Items[i].Tag is IDevice dev && dev.Id == id)
                 {
                     listBoxRecording.Items[i].Selected = true;
                     break;
@@ -1305,6 +1271,9 @@ namespace FortyOne.AudioSwitcher
 
                 if (Program.Settings.DualSwitchMode)
                     await hk.Device.SetAsDefaultCommunicationsAsync();
+
+                if (Program.Settings.ForceAppsFollowDefault)
+                    AppAudioRouter.ClearPersistedEndpoints();
             }
         }
 
@@ -1348,6 +1317,9 @@ namespace FortyOne.AudioSwitcher
 
                 if (Program.Settings.DualSwitchMode)
                     await dev.SetAsDefaultCommunicationsAsync();
+
+                if (Program.Settings.ForceAppsFollowDefault)
+                    AppAudioRouter.ClearPersistedEndpoints();
             }
         }
 
@@ -1484,5 +1456,49 @@ namespace FortyOne.AudioSwitcher
 				}));
 			}
 		}
+
+        private void chkForceAppsFollowDefault_CheckedChanged(object sender, EventArgs e)
+        {
+            Program.Settings.ForceAppsFollowDefault = chkForceAppsFollowDefault.Checked;
+        }
+
+        private void mnuHidePlaybackDevice_Click(object sender, EventArgs e)
+        {
+            if (SelectedPlaybackDevice == null)
+                return;
+
+            var id = SelectedPlaybackDevice.Id;
+
+            if (HiddenDeviceManager.IsHiddenDevice(id))
+                HiddenDeviceManager.UnhideDevice(id);
+            else
+                HiddenDeviceManager.HideDevice(id);
+
+            SaveHiddenDevices();
+            RefreshPlaybackDevices();
+            RefreshPlaybackDropDownButton();
+        }
+
+        private void mnuHideRecordingDevice_Click(object sender, EventArgs e)
+        {
+            if (SelectedRecordingDevice == null)
+                return;
+
+            var id = SelectedRecordingDevice.Id;
+
+            if (HiddenDeviceManager.IsHiddenDevice(id))
+                HiddenDeviceManager.UnhideDevice(id);
+            else
+                HiddenDeviceManager.HideDevice(id);
+
+            SaveHiddenDevices();
+            RefreshRecordingDevices();
+            RefreshRecordingDropDownButton();
+        }
+
+        private void SaveHiddenDevices()
+        {
+            Program.Settings.HiddenDevices = "[" + string.Join("],[", HiddenDeviceManager.HiddenDevices.ToArray()) + "]";
+        }
 	}
 }

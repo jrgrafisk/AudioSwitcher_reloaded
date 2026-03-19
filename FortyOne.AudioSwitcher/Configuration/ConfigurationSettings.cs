@@ -27,6 +27,8 @@ namespace FortyOne.AudioSwitcher.Configuration
         public const string SETTING_SHOWDISCONNECTEDDDEVICES = "ShowDisconnectedDevices";
         public const string SETTING_SHOWDPDEVICEIICONINTRAY = "ShowDPDeviceIconInTray";
         public const string SETTING_UPDATE_NOTIFICATIONS_ENABLED = "UpdateNotificationsEnabled";
+        public const string SETTING_FORCEAPPSFOLLOWDEFAULT = "ForceAppsFollowDefault";
+        public const string SETTING_HIDDENDEVICES = "HiddenDevices";
         private readonly ISettingsSource _configWriter;
 
         public ConfigurationSettings(ISettingsSource source)
@@ -240,6 +242,18 @@ namespace FortyOne.AudioSwitcher.Configuration
             set { _configWriter.Set(SETTING_UPDATE_NOTIFICATIONS_ENABLED, value.ToString()); }
         }
 
+        public bool ForceAppsFollowDefault
+        {
+            get { return Convert.ToBoolean(_configWriter.Get(SETTING_FORCEAPPSFOLLOWDEFAULT)); }
+            set { _configWriter.Set(SETTING_FORCEAPPSFOLLOWDEFAULT, value.ToString()); }
+        }
+
+        public string HiddenDevices
+        {
+            get { return _configWriter.Get(SETTING_HIDDENDEVICES); }
+            set { _configWriter.Set(SETTING_HIDDENDEVICES, value); }
+        }
+
         public void CreateDefaults()
         {
             if (!SettingExists(SETTING_CLOSETOTRAY))
@@ -300,6 +314,12 @@ namespace FortyOne.AudioSwitcher.Configuration
 
             if (!SettingExists(SETTING_UPDATE_NOTIFICATIONS_ENABLED))
                 UpdateNotificationsEnabled = PollForUpdates > 0;
+
+            if (!SettingExists(SETTING_FORCEAPPSFOLLOWDEFAULT))
+                ForceAppsFollowDefault = false;
+
+            if (!SettingExists(SETTING_HIDDENDEVICES))
+                HiddenDevices = "[]";
         }
 
         public void LoadFrom(ConfigurationSettings otherSettings)
@@ -321,6 +341,8 @@ namespace FortyOne.AudioSwitcher.Configuration
             StartupRecordingDeviceID = otherSettings.StartupRecordingDeviceID;
             WindowHeight = otherSettings.WindowHeight;
             WindowWidth = otherSettings.WindowWidth;
+            ForceAppsFollowDefault = otherSettings.ForceAppsFollowDefault;
+            HiddenDevices = otherSettings.HiddenDevices;
         }
 
         public bool SettingExists(string name)
