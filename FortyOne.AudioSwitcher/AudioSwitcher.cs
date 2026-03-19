@@ -625,11 +625,6 @@ namespace FortyOne.AudioSwitcher
             RefreshRecordingDropDownButton();
         }
 
-        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Process.Start("http://audioswit.ch/er?utm_source=client&utm_medium=direct&utm_campaign=client_" + AssemblyVersion.Replace(".", "_"));
-        }
-
         private void chkShowDiabledDevices_CheckedChanged(object sender, EventArgs e)
         {
             Program.Settings.ShowDisabledDevices = chkShowDiabledDevices.Checked;
@@ -774,6 +769,7 @@ namespace FortyOne.AudioSwitcher
 	        chkShowUnknownDevicesInHotkeyList.Checked = Program.Settings.ShowUnknownDevicesInHotkeyList;
             chkShowDisconnectedDevices.Checked = Program.Settings.ShowDisconnectedDevices;
             chkShowDPDeviceIconInTray.Checked = Program.Settings.ShowDPDeviceIconInTray;
+            chkForceAppsFollowDefault.Checked = Program.Settings.ForceAppsFollowDefault;
 
             Width = Program.Settings.WindowWidth;
             Height = Program.Settings.WindowHeight;
@@ -1196,6 +1192,13 @@ namespace FortyOne.AudioSwitcher
 
         private void PostPlaybackMenuClick(Guid id)
         {
+            if (Program.Settings.ForceAppsFollowDefault)
+            {
+                var endpointId = AppAudioRouter.GetEndpointId(id);
+                if (endpointId != null)
+                    AppAudioRouter.RouteAllProcessesToDevice(endpointId);
+            }
+
             RefreshPlaybackDevices();
             RefreshPlaybackDropDownButton();
             for (var i = 0; i < listBoxPlayback.Items.Count; i++)
@@ -1220,6 +1223,13 @@ namespace FortyOne.AudioSwitcher
 
         private void PostRecordingMenuClick(Guid id)
         {
+            if (Program.Settings.ForceAppsFollowDefault)
+            {
+                var endpointId = AppAudioRouter.GetEndpointId(id);
+                if (endpointId != null)
+                    AppAudioRouter.RouteAllProcessesToDevice(endpointId);
+            }
+
             RefreshRecordingDevices();
             RefreshRecordingDropDownButton();
             for (var i = 0; i < listBoxRecording.Items.Count; i++)
@@ -1357,24 +1367,14 @@ namespace FortyOne.AudioSwitcher
             ShowUpdateForm(true);
         }
 
-        private void pictureBox2_Click(object sender, EventArgs e)
-        {
-            Process.Start("https://www.twitter.com/xenolightning");
-        }
-
-        private void pictureBox1_Click_1(object sender, EventArgs e)
-        {
-            Process.Start("https://github.com/xenolightning/AudioSwitcher_v1");
-        }
-
         private void chkNotifyUpdates_CheckedChanged(object sender, EventArgs e)
         {
             Program.Settings.UpdateNotificationsEnabled = chkNotifyUpdates.Checked;
         }
 
-        private void twitterLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void chkForceAppsFollowDefault_CheckedChanged(object sender, EventArgs e)
         {
-            Process.Start("https://www.twitter.com/xenolightning");
+            Program.Settings.ForceAppsFollowDefault = chkForceAppsFollowDefault.Checked;
         }
 
         private void openControlPanelPlayback_Click(object sender, EventArgs e)

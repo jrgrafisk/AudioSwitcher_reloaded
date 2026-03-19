@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace FortyOne.AudioSwitcher
@@ -11,8 +12,7 @@ namespace FortyOne.AudioSwitcher
     internal class AudioPolicyConfigClient { }
 
     // Modern vtable layout: Windows 10 21H1+ and Windows 11
-    // Vtable slots 3-7: misc audio engine methods
-    // Slots 8-9: GetProcessDevicePreferences / SetProcessDevicePreferences (added ~21H1)
+    // Vtable slots 3-9: misc audio engine / device prefs methods
     // Slots 10-12: persisted per-app endpoint control
     [ComImport, Guid("ab3d4648-e242-459f-b02f-541c70306324")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -26,15 +26,17 @@ namespace FortyOne.AudioSwitcher
         void GetProcessDevicePreferences();
         void SetProcessDevicePreferences();
 
+        // deviceId is a WinRT HSTRING passed as IntPtr
+        // Use WindowsCreateString / WindowsDeleteString from combase.dll
         [PreserveSig]
         int SetPersistedDefaultAudioEndpoint(
             uint processId, EDataFlow flow, ERole role,
-            [MarshalAs(UnmanagedType.HString)] string deviceId);
+            IntPtr deviceId);
 
         [PreserveSig]
         int GetPersistedDefaultAudioEndpoint(
             uint processId, EDataFlow flow, ERole role,
-            [MarshalAs(UnmanagedType.HString)] out string deviceId);
+            out IntPtr deviceId);
 
         [PreserveSig]
         int ClearAllPersistedApplicationDefaultEndpoints();
@@ -74,13 +76,22 @@ namespace FortyOne.AudioSwitcher
     }
 
     /// <summary>
-    /// Routes audio for all apps to follow the system default device by clearing
-    /// per-app endpoint overrides set by apps like Discord or Qobuz.
-    /// Uses the undocumented IAudioPolicyConfig COM interface (Windows 10 21H1+ / Windows 11).
+    /// Routes all running app audio to a specific endpoint device.
+    /// Uses the undocumented IAudioPolicyConfig COM interface (Windows 10 21H1+ / Windows 11)
+    /// with manual HSTRING creation via combase.dll — required in WinForms context.
     /// </summary>
     internal static class AppAudioRouter
     {
         private const int DEVICE_STATEMASK_ALL = 0x0000000F;
+
+        [DllImport("combase.dll", PreserveSig = true)]
+        private static extern int WindowsCreateString(
+            [MarshalAs(UnmanagedType.LPWStr)] string sourceString,
+            uint length,
+            out IntPtr hstring);
+
+        [DllImport("combase.dll", PreserveSig = true)]
+        private static extern int WindowsDeleteString(IntPtr hstring);
 
         /// <summary>
         /// Returns the Windows endpoint ID string (e.g. "{0.0.0.00000000}.{guid}") for a device GUID.
@@ -107,21 +118,51 @@ namespace FortyOne.AudioSwitcher
         }
 
         /// <summary>
-        /// Clears all per-app audio endpoint overrides so every app falls back to
-        /// the Windows system default device. Works on Windows 10 21H1+ and Windows 11.
-        /// Silently no-ops on older systems.
+        /// Forces all currently running processes to use the given endpoint device for
+        /// both playback and communications roles. Mirrors what Windows Sound Settings does
+        /// when you pick a per-app device override. Silently no-ops on older Windows.
         /// </summary>
-        public static void ClearPersistedEndpoints()
+        public static void RouteAllProcessesToDevice(string endpointId)
         {
+            if (string.IsNullOrEmpty(endpointId))
+                return;
+
+            IntPtr hstring = IntPtr.Zero;
+            IAudioPolicyConfig policyConfig = null;
+
             try
             {
-                var policyConfig = (IAudioPolicyConfig)new AudioPolicyConfigClient();
-                int hr = policyConfig.ClearAllPersistedApplicationDefaultEndpoints();
-                // hr != 0 means failure (e.g. wrong vtable on older Windows) – silently ignore
+                int hr = WindowsCreateString(endpointId, (uint)endpointId.Length, out hstring);
+                if (hr != 0 || hstring == IntPtr.Zero)
+                    return;
+
+                policyConfig = (IAudioPolicyConfig)new AudioPolicyConfigClient();
+
+                foreach (var proc in Process.GetProcesses())
+                {
+                    try
+                    {
+                        uint pid = (uint)proc.Id;
+                        // Set for both render roles
+                        policyConfig.SetPersistedDefaultAudioEndpoint(pid, EDataFlow.eRender, ERole.eConsole, hstring);
+                        policyConfig.SetPersistedDefaultAudioEndpoint(pid, EDataFlow.eRender, ERole.eCommunications, hstring);
+                        policyConfig.SetPersistedDefaultAudioEndpoint(pid, EDataFlow.eRender, ERole.eMultimedia, hstring);
+                    }
+                    catch { }
+                    finally
+                    {
+                        try { proc.Dispose(); } catch { }
+                    }
+                }
             }
             catch
             {
                 // IAudioPolicyConfig not available on this Windows version; safe to ignore
+            }
+            finally
+            {
+                if (hstring != IntPtr.Zero)
+                    WindowsDeleteString(hstring);
             }
         }
     }

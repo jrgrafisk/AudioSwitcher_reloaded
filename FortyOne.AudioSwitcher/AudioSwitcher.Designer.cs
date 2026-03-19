@@ -64,6 +64,7 @@
 			this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tapSettings = new System.Windows.Forms.TabPage();
 			this.chkShowUnknownDevicesInHotkeyList = new System.Windows.Forms.CheckBox();
+			this.chkForceAppsFollowDefault = new System.Windows.Forms.CheckBox();
 			this.chkNotifyUpdates = new System.Windows.Forms.CheckBox();
 			this.chkShowDPDeviceIconInTray = new System.Windows.Forms.CheckBox();
 			this.btnCheckUpdate = new System.Windows.Forms.Button();
@@ -85,13 +86,9 @@
 			this.btnEditHotKey = new System.Windows.Forms.Button();
 			this.btnAddHotKey = new System.Windows.Forms.Button();
 			this.tapAbout = new System.Windows.Forms.TabPage();
-			this.twitterLink = new System.Windows.Forms.LinkLabel();
-			this.pictureBox2 = new System.Windows.Forms.PictureBox();
-			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.linkWiki = new System.Windows.Forms.LinkLabel();
 			this.linkIssues = new System.Windows.Forms.LinkLabel();
 			this.label3 = new System.Windows.Forms.Label();
-			this.linkLabel2 = new System.Windows.Forms.LinkLabel();
 			this.label6 = new System.Windows.Forms.Label();
 			this.linkLabel1 = new System.Windows.Forms.LinkLabel();
 			this.label4 = new System.Windows.Forms.Label();
@@ -111,7 +108,6 @@
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.statusLabelUpdate = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.statusLabelDonate = new System.Windows.Forms.ToolStripStatusLabel();
 			this.playbackStrip.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tapPlayback.SuspendLayout();
@@ -124,8 +120,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.hotKeyBindingSource)).BeginInit();
 			this.tapAbout.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.notifyIconStrip.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -418,6 +412,7 @@
 			// 
 			// tapSettings
 			// 
+			this.tapSettings.Controls.Add(this.chkForceAppsFollowDefault);
 			this.tapSettings.Controls.Add(this.chkShowUnknownDevicesInHotkeyList);
 			this.tapSettings.Controls.Add(this.chkNotifyUpdates);
 			this.tapSettings.Controls.Add(this.chkShowDPDeviceIconInTray);
@@ -451,8 +446,20 @@
 			this.chkShowUnknownDevicesInHotkeyList.UseVisualStyleBackColor = true;
 			this.chkShowUnknownDevicesInHotkeyList.CheckedChanged += new System.EventHandler(this.chkShowUnknownDevicesInHotkeyList_CheckedChanged);
 			// 
+			// chkForceAppsFollowDefault
+			//
+			this.chkForceAppsFollowDefault.AutoSize = true;
+			this.chkForceAppsFollowDefault.Location = new System.Drawing.Point(14, 269);
+			this.chkForceAppsFollowDefault.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+			this.chkForceAppsFollowDefault.Name = "chkForceAppsFollowDefault";
+			this.chkForceAppsFollowDefault.Size = new System.Drawing.Size(220, 17);
+			this.chkForceAppsFollowDefault.TabIndex = 17;
+			this.chkForceAppsFollowDefault.Text = "Force all apps to follow selected device";
+			this.chkForceAppsFollowDefault.UseVisualStyleBackColor = true;
+			this.chkForceAppsFollowDefault.CheckedChanged += new System.EventHandler(this.chkForceAppsFollowDefault_CheckedChanged);
+			//
 			// chkNotifyUpdates
-			// 
+			//
 			this.chkNotifyUpdates.AutoSize = true;
 			this.chkNotifyUpdates.Location = new System.Drawing.Point(14, 246);
 			this.chkNotifyUpdates.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
@@ -717,13 +724,9 @@
 			// 
 			// tapAbout
 			// 
-			this.tapAbout.Controls.Add(this.twitterLink);
-			this.tapAbout.Controls.Add(this.pictureBox2);
-			this.tapAbout.Controls.Add(this.pictureBox1);
 			this.tapAbout.Controls.Add(this.linkWiki);
 			this.tapAbout.Controls.Add(this.linkIssues);
 			this.tapAbout.Controls.Add(this.label3);
-			this.tapAbout.Controls.Add(this.linkLabel2);
 			this.tapAbout.Controls.Add(this.label6);
 			this.tapAbout.Controls.Add(this.linkLabel1);
 			this.tapAbout.Controls.Add(this.label4);
@@ -740,49 +743,7 @@
 			this.tapAbout.TabIndex = 2;
 			this.tapAbout.Text = "About";
 			this.tapAbout.UseVisualStyleBackColor = true;
-			// 
-			// twitterLink
-			// 
-			this.twitterLink.AutoSize = true;
-			this.twitterLink.Location = new System.Drawing.Point(156, 112);
-			this.twitterLink.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.twitterLink.Name = "twitterLink";
-			this.twitterLink.Size = new System.Drawing.Size(80, 13);
-			this.twitterLink.TabIndex = 23;
-			this.twitterLink.TabStop = true;
-			this.twitterLink.Text = "@xenolightning";
-			this.twitterLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.twitterLink_LinkClicked);
-			// 
-			// pictureBox2
-			// 
-			this.pictureBox2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-			this.pictureBox2.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.pictureBox2.Image = global::FortyOne.AudioSwitcher.Properties.Resources.twitter;
-			this.pictureBox2.Location = new System.Drawing.Point(90, 217);
-			this.pictureBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.pictureBox2.Name = "pictureBox2";
-			this.pictureBox2.Padding = new System.Windows.Forms.Padding(5);
-			this.pictureBox2.Size = new System.Drawing.Size(32, 32);
-			this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.pictureBox2.TabIndex = 22;
-			this.pictureBox2.TabStop = false;
-			this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
-			// 
-			// pictureBox1
-			// 
-			this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-			this.pictureBox1.Cursor = System.Windows.Forms.Cursors.Hand;
-			this.pictureBox1.Image = global::FortyOne.AudioSwitcher.Properties.Resources.github;
-			this.pictureBox1.Location = new System.Drawing.Point(144, 217);
-			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Padding = new System.Windows.Forms.Padding(5);
-			this.pictureBox1.Size = new System.Drawing.Size(32, 32);
-			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.pictureBox1.TabIndex = 21;
-			this.pictureBox1.TabStop = false;
-			this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click_1);
-			// 
+			//
 			// linkWiki
 			// 
 			this.linkWiki.BackColor = System.Drawing.Color.Transparent;
@@ -816,18 +777,6 @@
 			this.label3.Size = new System.Drawing.Size(167, 13);
 			this.label3.TabIndex = 16;
 			this.label3.Text = "Having trouble? Check            or  ";
-			// 
-			// linkLabel2
-			// 
-			this.linkLabel2.AutoSize = true;
-			this.linkLabel2.Location = new System.Drawing.Point(8, 43);
-			this.linkLabel2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.linkLabel2.Name = "linkLabel2";
-			this.linkLabel2.Size = new System.Drawing.Size(111, 13);
-			this.linkLabel2.TabIndex = 15;
-			this.linkLabel2.TabStop = true;
-			this.linkLabel2.Text = "http://audioswit.ch/er";
-			this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
 			// 
 			// label6
 			// 
@@ -883,7 +832,7 @@
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(240, 39);
 			this.label2.TabIndex = 5;
-			this.label2.Text = "Vibecoded for Windows 11.\r\nFork: github.com/jrgrafisk/AudioSwitcher_v1";
+			this.label2.Text = "If you like the app, share it with your mates!\r\nVibecoded for Windows 11.";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// lblCopyright
@@ -1041,8 +990,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.hotKeyBindingSource)).EndInit();
 			this.tapAbout.ResumeLayout(false);
 			this.tapAbout.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.notifyIconStrip.ResumeLayout(false);
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
@@ -1109,7 +1056,6 @@
         private System.Windows.Forms.Button btnAddHotKey;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button btnCheckUpdate;
-        private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.CheckBox chkShowDisconnectedDevices;
         private System.Windows.Forms.CheckBox chkShowDiabledDevices;
         private System.Windows.Forms.ToolTip toolTip1;
@@ -1125,9 +1071,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn deviceNameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn hotKeyStringDataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripMenuItem updateAvailableToolStripMenuItem;
-        private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.LinkLabel twitterLink;
+        private System.Windows.Forms.CheckBox chkForceAppsFollowDefault;
         private System.Windows.Forms.CheckBox chkNotifyUpdates;
         private System.Windows.Forms.PictureBox openControlPanelPlayback;
         private System.Windows.Forms.PictureBox openControlPanelRecording;
