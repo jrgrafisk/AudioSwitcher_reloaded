@@ -10,6 +10,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+  </ItemGroup>
+
   <!-- Exclude the old auto-generated SOAP proxy files that are no longer needed -->
   <ItemGroup>
     <None Include="Web References\AudioSwitcherService\AudioSwitcher.disco" />
