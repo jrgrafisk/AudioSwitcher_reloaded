@@ -793,6 +793,8 @@ namespace FortyOne.AudioSwitcher
                 return Guid.Empty;
             }));
 
+            DeviceNameManager.LoadCustomNames(Program.Settings.CustomDeviceNames);
+
             //Ensure to delete the key if it's not set
             Program.Settings.AutoStartWithWindows = Program.Settings.AutoStartWithWindows;
 
@@ -842,7 +844,7 @@ namespace FortyOne.AudioSwitcher
         private ListViewItem BuildDeviceListItem(IDevice ad, bool isHidden)
         {
             var li = new ListViewItem();
-            li.Text = ad.Name;
+            li.Text = DeviceNameManager.GetDisplayName(ad);
             li.Tag = ad;
             li.SubItems.Add(new ListViewItem.ListViewSubItem(li, ad.InterfaceName));
 
@@ -1005,7 +1007,7 @@ namespace FortyOne.AudioSwitcher
 
                 var item = new ToolStripMenuItem
                 {
-                    Text = ad.FullName,
+                    Text = DeviceNameManager.GetDisplayName(ad),
                     Tag = ad,
                     Checked = ad.IsDefaultDevice
                 };
@@ -1029,7 +1031,7 @@ namespace FortyOne.AudioSwitcher
 
                 var item = new ToolStripMenuItem
                 {
-                    Text = ad.FullName,
+                    Text = DeviceNameManager.GetDisplayName(ad),
                     Tag = ad,
                     Checked = ad.IsDefaultDevice
                 };
@@ -1041,6 +1043,8 @@ namespace FortyOne.AudioSwitcher
             if (recordingCount > 0)
                 notifyIconStrip.Items.Add(new ToolStripSeparator());
 
+            notifyIconStrip.Items.Add(toolStripSeparatorVolMixerNotify);
+            notifyIconStrip.Items.Add(mnuOpenVolumeMixerNotify);
             notifyIconStrip.Items.Add(preferencesToolStripMenuItem);
 
             if (_updateAvailable)
@@ -1054,7 +1058,7 @@ namespace FortyOne.AudioSwitcher
             //The maximum length of the noitfy text is 64 characters. This keeps it under
             if (defaultDevice != null)
             {
-                var devName = defaultDevice.FullName ?? defaultDevice.Name ?? notifyText;
+                var devName = DeviceNameManager.GetDisplayName(defaultDevice) ?? notifyText;
 
                 if (devName.Length >= 64)
                     notifyText = devName.Substring(0, 60) + "...";
@@ -1471,6 +1475,68 @@ namespace FortyOne.AudioSwitcher
         private void SaveHiddenDevices()
         {
             Program.Settings.HiddenDevices = "[" + string.Join("],[", HiddenDeviceManager.HiddenDevices.ToArray()) + "]";
+        }
+
+        private void SaveCustomNames()
+        {
+            Program.Settings.CustomDeviceNames = DeviceNameManager.SaveCustomNames();
+        }
+
+        private void mnuRenamePlaybackDevice_Click(object sender, EventArgs e)
+        {
+            var device = SelectedPlaybackDevice;
+            if (device == null) return;
+            RenameDevice(device);
+        }
+
+        private void mnuRenameRecordingDevice_Click(object sender, EventArgs e)
+        {
+            var device = SelectedRecordingDevice;
+            if (device == null) return;
+            RenameDevice(device);
+        }
+
+        private void RenameDevice(IDevice device)
+        {
+            var current = DeviceNameManager.GetCustomName(device.Id) ?? device.FullName;
+
+            using (var dlg = new Form())
+            {
+                dlg.Text = "Rename Device";
+                dlg.Size = new System.Drawing.Size(340, 120);
+                dlg.MinimumSize = dlg.Size;
+                dlg.MaximumSize = dlg.Size;
+                dlg.StartPosition = FormStartPosition.CenterParent;
+                dlg.FormBorderStyle = FormBorderStyle.FixedDialog;
+                dlg.MaximizeBox = false;
+                dlg.MinimizeBox = false;
+
+                var txt = new TextBox { Left = 10, Top = 10, Width = 305, Text = current };
+                var btnOk = new Button { Text = "OK", Left = 155, Top = 42, Width = 75, DialogResult = DialogResult.OK };
+                var btnReset = new Button { Text = "Reset", Left = 240, Top = 42, Width = 75 };
+                btnReset.Click += (s, ev) => { txt.Text = device.FullName; };
+
+                dlg.Controls.AddRange(new Control[] { txt, btnOk, btnReset });
+                dlg.AcceptButton = btnOk;
+
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    var newName = txt.Text.Trim();
+                    if (newName == device.FullName)
+                        DeviceNameManager.ClearCustomName(device.Id);
+                    else
+                        DeviceNameManager.SetCustomName(device.Id, newName);
+
+                    SaveCustomNames();
+                    RefreshPlaybackDevices();
+                    RefreshRecordingDevices();
+                }
+            }
+        }
+
+        private void mnuOpenVolumeMixer_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("sndvol.exe");
         }
 	}
 }
