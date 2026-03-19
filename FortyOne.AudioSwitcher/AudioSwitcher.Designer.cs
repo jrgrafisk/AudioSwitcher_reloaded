@@ -37,6 +37,7 @@
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.mnuFavouritePlaybackDevice = new System.Windows.Forms.ToolStripMenuItem();
 			this.setHotKeyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuHidePlaybackDevice = new System.Windows.Forms.ToolStripMenuItem();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tapPlayback = new System.Windows.Forms.TabPage();
 			this.openControlPanelPlayback = new System.Windows.Forms.PictureBox();
@@ -56,6 +57,7 @@
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.mnuFavouriteRecordingDevice = new System.Windows.Forms.ToolStripMenuItem();
 			this.setHotKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuHideRecordingDevice = new System.Windows.Forms.ToolStripMenuItem();
 			this.listBoxRecording = new System.Windows.Forms.ListView();
 			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -73,6 +75,7 @@
 			this.chkStartMinimized = new System.Windows.Forms.CheckBox();
 			this.chkDisableHotKeys = new System.Windows.Forms.CheckBox();
 			this.chkQuickSwitch = new System.Windows.Forms.CheckBox();
+			this.chkForceAppsFollowDefault = new System.Windows.Forms.CheckBox();
 			this.tapHotkeys = new System.Windows.Forms.TabPage();
 			this.btnClearAll = new System.Windows.Forms.Button();
 			this.btnDeleteHotKey = new System.Windows.Forms.Button();
@@ -136,7 +139,8 @@
             this.mnuSetPlaybackStartupDevice,
             this.toolStripSeparator2,
             this.mnuFavouritePlaybackDevice,
-            this.setHotKeyToolStripMenuItem1});
+            this.setHotKeyToolStripMenuItem1,
+            this.mnuHidePlaybackDevice});
 			this.playbackStrip.Name = "contextMenuStrip1";
 			this.playbackStrip.Size = new System.Drawing.Size(246, 120);
 			this.playbackStrip.Opening += new System.ComponentModel.CancelEventHandler(this.playbackStrip_Opening);
@@ -180,7 +184,14 @@
 			this.setHotKeyToolStripMenuItem1.Size = new System.Drawing.Size(245, 22);
 			this.setHotKeyToolStripMenuItem1.Text = "Set Hot Key";
 			this.setHotKeyToolStripMenuItem1.Click += new System.EventHandler(this.setHotKeyToolStripMenuItem1_Click);
-			// 
+			//
+			// mnuHidePlaybackDevice
+			//
+			this.mnuHidePlaybackDevice.Name = "mnuHidePlaybackDevice";
+			this.mnuHidePlaybackDevice.Size = new System.Drawing.Size(245, 22);
+			this.mnuHidePlaybackDevice.Text = "Hide Device";
+			this.mnuHidePlaybackDevice.Click += new System.EventHandler(this.mnuHidePlaybackDevice_Click);
+			//
 			// tabControl1
 			// 
 			this.tabControl1.Controls.Add(this.tapPlayback);
@@ -330,7 +341,8 @@
             this.mnuSetRecordingStartupDevice,
             this.toolStripSeparator3,
             this.mnuFavouriteRecordingDevice,
-            this.setHotKeyToolStripMenuItem});
+            this.setHotKeyToolStripMenuItem,
+            this.mnuHideRecordingDevice});
 			this.recordingStrip.Name = "contextMenuStrip1";
 			this.recordingStrip.Size = new System.Drawing.Size(246, 120);
 			this.recordingStrip.Opening += new System.ComponentModel.CancelEventHandler(this.recordingStrip_Opening);
@@ -374,7 +386,14 @@
 			this.setHotKeyToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
 			this.setHotKeyToolStripMenuItem.Text = "Set Hot Key";
 			this.setHotKeyToolStripMenuItem.Click += new System.EventHandler(this.setHotKeyToolStripMenuItem_Click);
-			// 
+			//
+			// mnuHideRecordingDevice
+			//
+			this.mnuHideRecordingDevice.Name = "mnuHideRecordingDevice";
+			this.mnuHideRecordingDevice.Size = new System.Drawing.Size(245, 22);
+			this.mnuHideRecordingDevice.Text = "Hide Device";
+			this.mnuHideRecordingDevice.Click += new System.EventHandler(this.mnuHideRecordingDevice_Click);
+			//
 			// listBoxRecording
 			// 
 			this.listBoxRecording.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -412,6 +431,7 @@
 			this.tapSettings.Controls.Add(this.chkStartMinimized);
 			this.tapSettings.Controls.Add(this.chkDisableHotKeys);
 			this.tapSettings.Controls.Add(this.chkQuickSwitch);
+			this.tapSettings.Controls.Add(this.chkForceAppsFollowDefault);
 			this.tapSettings.Location = new System.Drawing.Point(4, 22);
 			this.tapSettings.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.tapSettings.Name = "tapSettings";
@@ -424,7 +444,7 @@
 			// chkShowUnknownDevicesInHotkeyList
 			// 
 			this.chkShowUnknownDevicesInHotkeyList.AutoSize = true;
-			this.chkShowUnknownDevicesInHotkeyList.Location = new System.Drawing.Point(14, 177);
+			this.chkShowUnknownDevicesInHotkeyList.Location = new System.Drawing.Point(14, 200);
 			this.chkShowUnknownDevicesInHotkeyList.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkShowUnknownDevicesInHotkeyList.Name = "chkShowUnknownDevicesInHotkeyList";
 			this.chkShowUnknownDevicesInHotkeyList.Size = new System.Drawing.Size(212, 17);
@@ -432,11 +452,24 @@
 			this.chkShowUnknownDevicesInHotkeyList.Text = "Show Unknown Devices In Hotkey List";
 			this.chkShowUnknownDevicesInHotkeyList.UseVisualStyleBackColor = true;
 			this.chkShowUnknownDevicesInHotkeyList.CheckedChanged += new System.EventHandler(this.chkShowUnknownDevicesInHotkeyList_CheckedChanged);
+			//
+			// chkForceAppsFollowDefault
+			//
+			this.chkForceAppsFollowDefault.AutoSize = true;
+			this.chkForceAppsFollowDefault.Location = new System.Drawing.Point(14, 177);
+			this.chkForceAppsFollowDefault.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+			this.chkForceAppsFollowDefault.Name = "chkForceAppsFollowDefault";
+			this.chkForceAppsFollowDefault.Size = new System.Drawing.Size(230, 17);
+			this.chkForceAppsFollowDefault.TabIndex = 17;
+			this.chkForceAppsFollowDefault.Text = "Force all apps to follow selected device";
+			this.toolTip1.SetToolTip(this.chkForceAppsFollowDefault, "When switching, clear per-app audio overrides (e.g. Discord, Qobuz) so all apps use the system default");
+			this.chkForceAppsFollowDefault.UseVisualStyleBackColor = true;
+			this.chkForceAppsFollowDefault.CheckedChanged += new System.EventHandler(this.chkForceAppsFollowDefault_CheckedChanged);
 			// 
 			// chkNotifyUpdates
 			// 
 			this.chkNotifyUpdates.AutoSize = true;
-			this.chkNotifyUpdates.Location = new System.Drawing.Point(14, 246);
+			this.chkNotifyUpdates.Location = new System.Drawing.Point(14, 269);
 			this.chkNotifyUpdates.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkNotifyUpdates.Name = "chkNotifyUpdates";
 			this.chkNotifyUpdates.Size = new System.Drawing.Size(174, 17);
@@ -448,7 +481,7 @@
 			// chkShowDPDeviceIconInTray
 			// 
 			this.chkShowDPDeviceIconInTray.AutoSize = true;
-			this.chkShowDPDeviceIconInTray.Location = new System.Drawing.Point(14, 223);
+			this.chkShowDPDeviceIconInTray.Location = new System.Drawing.Point(14, 246);
 			this.chkShowDPDeviceIconInTray.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkShowDPDeviceIconInTray.Name = "chkShowDPDeviceIconInTray";
 			this.chkShowDPDeviceIconInTray.Size = new System.Drawing.Size(228, 17);
@@ -472,7 +505,7 @@
 			// chkShowDisconnectedDevices
 			// 
 			this.chkShowDisconnectedDevices.AutoSize = true;
-			this.chkShowDisconnectedDevices.Location = new System.Drawing.Point(14, 200);
+			this.chkShowDisconnectedDevices.Location = new System.Drawing.Point(14, 223);
 			this.chkShowDisconnectedDevices.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkShowDisconnectedDevices.Name = "chkShowDisconnectedDevices";
 			this.chkShowDisconnectedDevices.Size = new System.Drawing.Size(164, 17);
@@ -1131,6 +1164,9 @@
         private System.Windows.Forms.PictureBox openControlPanelPlayback;
         private System.Windows.Forms.PictureBox openControlPanelRecording;
 		private System.Windows.Forms.CheckBox chkShowUnknownDevicesInHotkeyList;
+        private System.Windows.Forms.CheckBox chkForceAppsFollowDefault;
+        private System.Windows.Forms.ToolStripMenuItem mnuHidePlaybackDevice;
+        private System.Windows.Forms.ToolStripMenuItem mnuHideRecordingDevice;
 	}
 }
 
