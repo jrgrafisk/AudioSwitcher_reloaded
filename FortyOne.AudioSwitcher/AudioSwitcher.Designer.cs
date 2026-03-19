@@ -86,12 +86,9 @@
 			this.btnEditHotKey = new System.Windows.Forms.Button();
 			this.btnAddHotKey = new System.Windows.Forms.Button();
 			this.tapAbout = new System.Windows.Forms.TabPage();
-			this.linkWiki = new System.Windows.Forms.LinkLabel();
-			this.linkIssues = new System.Windows.Forms.LinkLabel();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-			this.label4 = new System.Windows.Forms.Label();
 			this.btnTestError = new System.Windows.Forms.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.lblCopyright = new System.Windows.Forms.Label();
