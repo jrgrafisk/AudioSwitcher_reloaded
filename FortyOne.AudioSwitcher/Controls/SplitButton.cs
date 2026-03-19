@@ -15,7 +15,6 @@ namespace FortyOne.AudioSwitcher.Controls
         private Rectangle dropDownRectangle;
         private bool isMouseEntered;
         private bool isSplitMenuVisible;
-        private ContextMenu m_SplitMenu;
         private ContextMenuStrip m_SplitMenuStrip;
         private bool showSplit;
         private bool skipNextOpen;
@@ -147,10 +146,6 @@ namespace FortyOne.AudioSwitcher.Controls
                 return;
             }
 
-            //handle ContextMenu re-clicking the drop-down region to close the menu
-            if (m_SplitMenu != null && e.Button == MouseButtons.Left && !isMouseEntered)
-                skipNextOpen = true;
-
             if (dropDownRectangle.Contains(e.Location) && !isSplitMenuVisible && e.Button == MouseButtons.Left)
             {
                 ShowContextMenuStrip();
@@ -174,7 +169,7 @@ namespace FortyOne.AudioSwitcher.Controls
             {
                 ShowContextMenuStrip();
             }
-            else if (m_SplitMenuStrip == null && m_SplitMenu == null || !isSplitMenuVisible)
+            else if (m_SplitMenuStrip == null || !isSplitMenuVisible)
             {
                 SetButtonDrawState();
 
@@ -388,11 +383,7 @@ namespace FortyOne.AudioSwitcher.Controls
 
             State = PushButtonState.Pressed;
 
-            if (m_SplitMenu != null)
-            {
-                m_SplitMenu.Show(this, new Point(0, Height));
-            }
-            else if (m_SplitMenuStrip != null)
+            if (m_SplitMenuStrip != null)
             {
                 m_SplitMenuStrip.Show(this, new Point(0, Height), ToolStripDropDownDirection.BelowRight);
             }
@@ -414,11 +405,6 @@ namespace FortyOne.AudioSwitcher.Controls
                 skipNextOpen = (dropDownRectangle.Contains(PointToClient(Cursor.Position))) &&
                                MouseButtons == MouseButtons.Left;
             }
-        }
-
-        private void SplitMenu_Popup(object sender, EventArgs e)
-        {
-            isSplitMenuVisible = true;
         }
 
         protected override void WndProc(ref Message m)
@@ -461,31 +447,6 @@ namespace FortyOne.AudioSwitcher.Controls
         {
             get { return SplitMenuStrip; }
             set { SplitMenuStrip = value; }
-        }
-
-        [DefaultValue(null)]
-        public ContextMenu SplitMenu
-        {
-            get { return m_SplitMenu; }
-            set
-            {
-                //remove the event handlers for the old SplitMenu
-                if (m_SplitMenu != null)
-                {
-                    m_SplitMenu.Popup -= SplitMenu_Popup;
-                }
-
-                //add the event handlers for the new SplitMenu
-                if (value != null)
-                {
-                    ShowSplit = true;
-                    value.Popup += SplitMenu_Popup;
-                }
-                else
-                    ShowSplit = false;
-
-                m_SplitMenu = value;
-            }
         }
 
         [DefaultValue(null)]
