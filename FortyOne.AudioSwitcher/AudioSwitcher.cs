@@ -594,9 +594,9 @@ namespace FortyOne.AudioSwitcher
             MinimizeFootprint();
         }
 
-        private void linkLabel1_Click(object sender, EventArgs e)
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("http://services.audioswit.ch/versions/");
+            Process.Start("https://github.com/jrgrafisk/AudioSwitcher_v1");
         }
 
         private void mnuSetPlaybackStartupDevice_Click(object sender, EventArgs e)
@@ -675,16 +675,6 @@ namespace FortyOne.AudioSwitcher
         {
             if (SelectedRecordingDevice == null)
                 e.Cancel = true;
-        }
-
-        private void linkIssues_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Process.Start("https://github.com/xenolightning/AudioSwitcher_v1/issues");
-        }
-
-        private void linkWiki_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Process.Start("https://github.com/xenolightning/AudioSwitcher_v1/wiki");
         }
 
         private void chkShowDPDeviceIconInTray_CheckedChanged(object sender, EventArgs e)

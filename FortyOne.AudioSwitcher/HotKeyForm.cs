@@ -117,23 +117,27 @@ namespace FortyOne.AudioSwitcher
 
         private void txtHotKey_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.Menu)
+            // Skip bare modifier-only key presses
+            if (e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.ControlKey ||
+                e.KeyCode == Keys.Menu || e.KeyCode == Keys.LWin || e.KeyCode == Keys.RWin)
                 return;
 
             _hotkey.Key = e.KeyCode;
             _hotkey.Modifiers = Modifiers.None;
 
             if (e.Control)
-                _hotkey.Modifiers = _hotkey.Modifiers | Modifiers.Control;
+                _hotkey.Modifiers |= Modifiers.Control;
 
             if (e.Alt)
-                _hotkey.Modifiers = _hotkey.Modifiers | Modifiers.Alt;
+                _hotkey.Modifiers |= Modifiers.Alt;
 
             if (e.Shift)
-                _hotkey.Modifiers = _hotkey.Modifiers | Modifiers.Shift;
+                _hotkey.Modifiers |= Modifiers.Shift;
 
-            if (e.Modifiers == Keys.LWin || e.Modifiers == Keys.RWin)
-                _hotkey.Modifiers = _hotkey.Modifiers | Modifiers.Win;
+            // e.Modifiers never contains Win in WinForms — must check via GetAsyncKeyState
+            if ((HotKeyData.NativeMethods.GetAsyncKeyState((int)Keys.LWin) & 0x8000) != 0 ||
+                (HotKeyData.NativeMethods.GetAsyncKeyState((int)Keys.RWin) & 0x8000) != 0)
+                _hotkey.Modifiers |= Modifiers.Win;
 
             txtHotKey.Text = _hotkey.HotKeyString;
 

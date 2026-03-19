@@ -724,12 +724,9 @@
 			// 
 			// tapAbout
 			// 
-			this.tapAbout.Controls.Add(this.linkWiki);
-			this.tapAbout.Controls.Add(this.linkIssues);
 			this.tapAbout.Controls.Add(this.label3);
 			this.tapAbout.Controls.Add(this.label6);
 			this.tapAbout.Controls.Add(this.linkLabel1);
-			this.tapAbout.Controls.Add(this.label4);
 			this.tapAbout.Controls.Add(this.btnTestError);
 			this.tapAbout.Controls.Add(this.label2);
 			this.tapAbout.Controls.Add(this.lblCopyright);
@@ -744,39 +741,15 @@
 			this.tapAbout.Text = "About";
 			this.tapAbout.UseVisualStyleBackColor = true;
 			//
-			// linkWiki
-			// 
-			this.linkWiki.BackColor = System.Drawing.Color.Transparent;
-			this.linkWiki.Location = new System.Drawing.Point(167, 134);
-			this.linkWiki.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.linkWiki.Name = "linkWiki";
-			this.linkWiki.Size = new System.Drawing.Size(28, 14);
-			this.linkWiki.TabIndex = 18;
-			this.linkWiki.TabStop = true;
-			this.linkWiki.Text = "wiki";
-			this.linkWiki.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkWiki_LinkClicked);
-			// 
-			// linkIssues
-			// 
-			this.linkIssues.BackColor = System.Drawing.Color.Transparent;
-			this.linkIssues.Location = new System.Drawing.Point(120, 134);
-			this.linkIssues.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.linkIssues.Name = "linkIssues";
-			this.linkIssues.Size = new System.Drawing.Size(36, 14);
-			this.linkIssues.TabIndex = 17;
-			this.linkIssues.TabStop = true;
-			this.linkIssues.Text = "issues";
-			this.linkIssues.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkIssues_LinkClicked);
-			// 
 			// label3
-			// 
+			//
 			this.label3.AutoSize = true;
 			this.label3.Location = new System.Drawing.Point(8, 134);
 			this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(167, 13);
+			this.label3.Size = new System.Drawing.Size(200, 13);
 			this.label3.TabIndex = 16;
-			this.label3.Text = "Having trouble? Check            or  ";
+			this.label3.Text = "This software is free. Always will be.";
 			// 
 			// label6
 			// 
@@ -789,26 +762,17 @@
 			this.label6.Text = "Original by Sean Chapman (@xenolightning)";
 			// 
 			// linkLabel1
-			// 
+			//
+			this.linkLabel1.AutoSize = true;
 			this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
-			this.linkLabel1.Location = new System.Drawing.Point(37, 165);
-			this.linkLabel1.Margin = new System.Windows.Forms.Padding(0);
+			this.linkLabel1.Location = new System.Drawing.Point(8, 152);
+			this.linkLabel1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.linkLabel1.Name = "linkLabel1";
-			this.linkLabel1.Size = new System.Drawing.Size(28, 15);
+			this.linkLabel1.Size = new System.Drawing.Size(200, 13);
 			this.linkLabel1.TabIndex = 12;
 			this.linkLabel1.TabStop = true;
-			this.linkLabel1.Text = "here";
-			this.linkLabel1.Click += new System.EventHandler(this.linkLabel1_Click);
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(10, 165);
-			this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(210, 13);
-			this.label4.TabIndex = 11;
-			this.label4.Text = "Click          for all versions of AudioSwitcher";
+			this.linkLabel1.Text = "github.com/jrgrafisk/AudioSwitcher_v1";
+			this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
 			// 
 			// btnTestError
 			// 
@@ -1045,7 +1009,6 @@
         private Controls.SplitButton btnSetRecordingDefault;
         private System.Windows.Forms.Timer memoryCleaner;
         private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ToolStripMenuItem mnuSetPlaybackStartupDevice;
         private System.Windows.Forms.ToolStripMenuItem mnuSetRecordingStartupDevice;
         private System.Windows.Forms.Label label6;
@@ -1059,8 +1022,6 @@
         private System.Windows.Forms.CheckBox chkShowDisconnectedDevices;
         private System.Windows.Forms.CheckBox chkShowDiabledDevices;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.LinkLabel linkWiki;
-        private System.Windows.Forms.LinkLabel linkIssues;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox chkShowDPDeviceIconInTray;
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;

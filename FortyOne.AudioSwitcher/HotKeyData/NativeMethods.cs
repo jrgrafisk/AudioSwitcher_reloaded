@@ -250,6 +250,9 @@ namespace FortyOne.AudioSwitcher.HotKeyData
         [DllImport(USER32, SetLastError = true)]
         public static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
 
+        [DllImport(USER32)]
+        public static extern short GetAsyncKeyState(int vKey);
+
         [DllImport(USER32, SetLastError = true)]
         public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
