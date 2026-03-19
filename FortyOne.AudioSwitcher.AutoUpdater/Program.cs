@@ -1,13 +1,22 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace FortyOne.AudioSwitcher.AutoUpdater
 {
     internal class Program
     {
+        private static readonly HttpClient _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(60)
+        };
+
+        private const string ServiceUrl = "http://services.audioswit.ch/AudioSwitcher.asmx";
+
         private static int Main(string[] args)
         {
             if (args.Length != 2)
@@ -54,13 +63,10 @@ namespace FortyOne.AudioSwitcher.AutoUpdater
 
                 File.Move(audioSwitcherPath, audioSwitcherOldPath);
 
-                using (var wc = new WebClient())
-                using (var client = new AudioSwitcherService.AudioSwitcher())
-                {
-                    var url = client.CheckForUpdate("0.0.0.0").Replace(".zip", ".exe");
+                var url = CheckForUpdate("0.0.0.0").Replace(".zip", ".exe");
 
-                    wc.DownloadFile(url, audioSwitcherPath);
-                }
+                var bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                File.WriteAllBytes(audioSwitcherPath, bytes);
             }
             catch
             {
@@ -82,6 +88,31 @@ namespace FortyOne.AudioSwitcher.AutoUpdater
             Console.WriteLine("Updating Complete");
 
             return Exit();
+        }
+
+        private static string CheckForUpdate(string assemblyVersion)
+        {
+            var envelope = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<soap:Envelope xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+               xmlns:xsd=""http://www.w3.org/2001/XMLSchema""
+               xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"">
+  <soap:Body>
+    <CheckForUpdate xmlns=""http://tempuri.org/"">
+      <assemblyVersion>{assemblyVersion}</assemblyVersion>
+    </CheckForUpdate>
+  </soap:Body>
+</soap:Envelope>";
+
+            var content = new StringContent(envelope, Encoding.UTF8, "text/xml");
+            content.Headers.Add("SOAPAction", "\"http://tempuri.org/CheckForUpdate\"");
+
+            var response = _httpClient.PostAsync(ServiceUrl, content).GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
+
+            var xml = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            var doc = XDocument.Parse(xml);
+            XNamespace ns = "http://tempuri.org/";
+            return doc.Descendants(ns + "CheckForUpdateResult").FirstOrDefault()?.Value ?? string.Empty;
         }
 
         private static int Exit()

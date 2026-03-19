@@ -1,27 +1,25 @@
-﻿using System.Net;
+using System;
+using System.Net.Http;
+using FortyOne.AudioSwitcher.AudioSwitcherService;
 using FortyOne.AudioSwitcher.Properties;
 
 namespace FortyOne.AudioSwitcher.Helpers
 {
     public static class ConnectionHelper
     {
+        private static readonly HttpClient _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(10)
+        };
+
         public static bool IsServerOnline
         {
             get
             {
                 try
                 {
-                    var wc = new WebClient();
-
-                    var defaultProxy = WebRequest.DefaultWebProxy;
-                    if (defaultProxy != null)
-                    {
-                        defaultProxy.Credentials = CredentialCache.DefaultCredentials;
-                        wc.Proxy = defaultProxy;
-                    }
-
-                    wc.DownloadData(Resources.WebServiceURL);
-                    return true;
+                    var response = _httpClient.GetAsync(Resources.WebServiceURL).GetAwaiter().GetResult();
+                    return response.IsSuccessStatusCode;
                 }
                 catch
                 {
@@ -30,20 +28,10 @@ namespace FortyOne.AudioSwitcher.Helpers
             }
         }
 
-        public static AudioSwitcherService.AudioSwitcher GetAudioSwitcherProxy()
+        public static AudioSwitcherClient GetAudioSwitcherProxy()
         {
             if (IsServerOnline)
-            {
-                var defaultProxy = WebRequest.DefaultWebProxy;
-                if (defaultProxy != null)
-                    defaultProxy.Credentials = CredentialCache.DefaultCredentials;
-
-                return new AudioSwitcherService.AudioSwitcher
-                {
-                    Proxy = defaultProxy,
-                    Url = Resources.WebServiceURL
-                };
-            }
+                return new AudioSwitcherClient(Resources.WebServiceURL);
             return null;
         }
     }

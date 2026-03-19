@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.9.0)'
+        required: true
+
+jobs:
+  build:
+    name: Build & Publish
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore FortyOne.AudioSwitcher/FortyOne.AudioSwitcher.GUI.csproj
+
+      - name: Publish AudioSwitcher (single-file)
+        run: >
+          dotnet publish FortyOne.AudioSwitcher/FortyOne.AudioSwitcher.GUI.csproj
+          -c Release
+          -r win-x86
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish/AudioSwitcher
+
+      - name: Publish AutoUpdater (single-file)
+        run: >
+          dotnet publish FortyOne.AudioSwitcher.AutoUpdater/FortyOne.AudioSwitcher.AutoUpdater.csproj
+          -c Release
+          -r win-x86
+          --self-contained true
+          -p:PublishSingleFile=true
+          -o publish/AudioSwitcher
+
+      - name: Determine release tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Zip release artifacts
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/AudioSwitcher/* -DestinationPath AudioSwitcher-${{ steps.tag.outputs.value }}-win-x86.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.value }}
+          name: AudioSwitcher ${{ steps.tag.outputs.value }}
+          draft: false
+          prerelease: false
+          files: AudioSwitcher-${{ steps.tag.outputs.value }}-win-x86.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
