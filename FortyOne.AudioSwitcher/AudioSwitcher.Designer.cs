@@ -75,7 +75,6 @@
 			this.chkStartMinimized = new System.Windows.Forms.CheckBox();
 			this.chkDisableHotKeys = new System.Windows.Forms.CheckBox();
 			this.chkQuickSwitch = new System.Windows.Forms.CheckBox();
-			this.chkForceAppsFollowDefault = new System.Windows.Forms.CheckBox();
 			this.tapHotkeys = new System.Windows.Forms.TabPage();
 			this.btnClearAll = new System.Windows.Forms.Button();
 			this.btnDeleteHotKey = new System.Windows.Forms.Button();
@@ -431,7 +430,6 @@
 			this.tapSettings.Controls.Add(this.chkStartMinimized);
 			this.tapSettings.Controls.Add(this.chkDisableHotKeys);
 			this.tapSettings.Controls.Add(this.chkQuickSwitch);
-			this.tapSettings.Controls.Add(this.chkForceAppsFollowDefault);
 			this.tapSettings.Location = new System.Drawing.Point(4, 22);
 			this.tapSettings.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.tapSettings.Name = "tapSettings";
@@ -444,7 +442,7 @@
 			// chkShowUnknownDevicesInHotkeyList
 			// 
 			this.chkShowUnknownDevicesInHotkeyList.AutoSize = true;
-			this.chkShowUnknownDevicesInHotkeyList.Location = new System.Drawing.Point(14, 200);
+			this.chkShowUnknownDevicesInHotkeyList.Location = new System.Drawing.Point(14, 177);
 			this.chkShowUnknownDevicesInHotkeyList.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkShowUnknownDevicesInHotkeyList.Name = "chkShowUnknownDevicesInHotkeyList";
 			this.chkShowUnknownDevicesInHotkeyList.Size = new System.Drawing.Size(212, 17);
@@ -452,24 +450,11 @@
 			this.chkShowUnknownDevicesInHotkeyList.Text = "Show Unknown Devices In Hotkey List";
 			this.chkShowUnknownDevicesInHotkeyList.UseVisualStyleBackColor = true;
 			this.chkShowUnknownDevicesInHotkeyList.CheckedChanged += new System.EventHandler(this.chkShowUnknownDevicesInHotkeyList_CheckedChanged);
-			//
-			// chkForceAppsFollowDefault
-			//
-			this.chkForceAppsFollowDefault.AutoSize = true;
-			this.chkForceAppsFollowDefault.Location = new System.Drawing.Point(14, 177);
-			this.chkForceAppsFollowDefault.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.chkForceAppsFollowDefault.Name = "chkForceAppsFollowDefault";
-			this.chkForceAppsFollowDefault.Size = new System.Drawing.Size(230, 17);
-			this.chkForceAppsFollowDefault.TabIndex = 17;
-			this.chkForceAppsFollowDefault.Text = "Force all apps to follow selected device";
-			this.toolTip1.SetToolTip(this.chkForceAppsFollowDefault, "When switching, clear per-app audio overrides (e.g. Discord, Qobuz) so all apps use the system default");
-			this.chkForceAppsFollowDefault.UseVisualStyleBackColor = true;
-			this.chkForceAppsFollowDefault.CheckedChanged += new System.EventHandler(this.chkForceAppsFollowDefault_CheckedChanged);
 			// 
 			// chkNotifyUpdates
 			// 
 			this.chkNotifyUpdates.AutoSize = true;
-			this.chkNotifyUpdates.Location = new System.Drawing.Point(14, 269);
+			this.chkNotifyUpdates.Location = new System.Drawing.Point(14, 246);
 			this.chkNotifyUpdates.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkNotifyUpdates.Name = "chkNotifyUpdates";
 			this.chkNotifyUpdates.Size = new System.Drawing.Size(174, 17);
@@ -481,7 +466,7 @@
 			// chkShowDPDeviceIconInTray
 			// 
 			this.chkShowDPDeviceIconInTray.AutoSize = true;
-			this.chkShowDPDeviceIconInTray.Location = new System.Drawing.Point(14, 246);
+			this.chkShowDPDeviceIconInTray.Location = new System.Drawing.Point(14, 223);
 			this.chkShowDPDeviceIconInTray.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkShowDPDeviceIconInTray.Name = "chkShowDPDeviceIconInTray";
 			this.chkShowDPDeviceIconInTray.Size = new System.Drawing.Size(228, 17);
@@ -505,7 +490,7 @@
 			// chkShowDisconnectedDevices
 			// 
 			this.chkShowDisconnectedDevices.AutoSize = true;
-			this.chkShowDisconnectedDevices.Location = new System.Drawing.Point(14, 223);
+			this.chkShowDisconnectedDevices.Location = new System.Drawing.Point(14, 200);
 			this.chkShowDisconnectedDevices.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.chkShowDisconnectedDevices.Name = "chkShowDisconnectedDevices";
 			this.chkShowDisconnectedDevices.Size = new System.Drawing.Size(164, 17);
@@ -852,7 +837,7 @@
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(149, 13);
 			this.label6.TabIndex = 13;
-			this.label6.Text = "Development: Sean Chapman";
+			this.label6.Text = "Original by Sean Chapman (@xenolightning)";
 			// 
 			// linkLabel1
 			// 
@@ -898,8 +883,7 @@
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(240, 39);
 			this.label2.TabIndex = 5;
-			this.label2.Text = "Audio Switcher is 100% free.\r\nYou can use it wherever and whenever you wish.\r\nIf " +
-    "you like the app, please donate :-)";
+			this.label2.Text = "Vibecoded for Windows 11.\r\nFork: github.com/jrgrafisk/AudioSwitcher_v1";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// lblCopyright
@@ -991,8 +975,7 @@
 			this.statusStrip1.BackColor = System.Drawing.SystemColors.ControlLightLight;
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusLabelUpdate,
-            this.toolStripStatusLabel1,
-            this.statusLabelDonate});
+            this.toolStripStatusLabel1});
 			this.statusStrip1.Location = new System.Drawing.Point(2, 340);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.ShowItemToolTips = true;
@@ -1018,20 +1001,6 @@
 			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
 			this.toolStripStatusLabel1.Size = new System.Drawing.Size(113, 17);
 			this.toolStripStatusLabel1.Spring = true;
-			// 
-			// statusLabelDonate
-			// 
-			this.statusLabelDonate.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.statusLabelDonate.Font = new System.Drawing.Font("Segoe UI", 9F);
-			this.statusLabelDonate.IsLink = true;
-			this.statusLabelDonate.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-			this.statusLabelDonate.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-			this.statusLabelDonate.Margin = new System.Windows.Forms.Padding(0, 0, 0, 2);
-			this.statusLabelDonate.Name = "statusLabelDonate";
-			this.statusLabelDonate.Size = new System.Drawing.Size(45, 20);
-			this.statusLabelDonate.Text = "Donate";
-			this.statusLabelDonate.ToolTipText = "Donate via PayPal";
-			this.statusLabelDonate.Click += new System.EventHandler(this.statusLabelDonate_Click);
 			// 
 			// AudioSwitcher
 			// 
@@ -1153,7 +1122,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabelUpdate;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabelDonate;
         private System.Windows.Forms.DataGridViewTextBoxColumn deviceNameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn hotKeyStringDataGridViewTextBoxColumn;
         private System.Windows.Forms.ToolStripMenuItem updateAvailableToolStripMenuItem;
@@ -1164,7 +1132,6 @@
         private System.Windows.Forms.PictureBox openControlPanelPlayback;
         private System.Windows.Forms.PictureBox openControlPanelRecording;
 		private System.Windows.Forms.CheckBox chkShowUnknownDevicesInHotkeyList;
-        private System.Windows.Forms.CheckBox chkForceAppsFollowDefault;
         private System.Windows.Forms.ToolStripMenuItem mnuHidePlaybackDevice;
         private System.Windows.Forms.ToolStripMenuItem mnuHideRecordingDevice;
 	}
