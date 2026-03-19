@@ -51,7 +51,7 @@ namespace FortyOne.AudioSwitcher
                     File.Delete(updaterPath);
 
                 //v1.6
-                updaterPath = Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "AutoUpdater.exe");
+                updaterPath = Path.Combine(AppContext.BaseDirectory, "AutoUpdater.exe");
                 if (File.Exists(updaterPath))
                     File.Delete(updaterPath);
 
@@ -67,7 +67,7 @@ namespace FortyOne.AudioSwitcher
 
             try
             {
-                var iniSettingsPath = Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, Resources.OldConfigFile);
+                var iniSettingsPath = Path.Combine(AppContext.BaseDirectory, Resources.OldConfigFile);
 
                 if (File.Exists(iniSettingsPath))
                     File.Delete(iniSettingsPath);
@@ -81,7 +81,7 @@ namespace FortyOne.AudioSwitcher
             {
 
                 //old json settings
-                var oldJsonSettingsPath = Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, Resources.ConfigFile);
+                var oldJsonSettingsPath = Path.Combine(AppContext.BaseDirectory, Resources.ConfigFile);
 
                 ISettingsSource jsonSource = new JsonSettings();
                 jsonSource.SetFilePath(settingsPath);
