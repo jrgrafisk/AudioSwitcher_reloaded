@@ -58,6 +58,11 @@
 			this.mnuFavouriteRecordingDevice = new System.Windows.Forms.ToolStripMenuItem();
 			this.setHotKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mnuHideRecordingDevice = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuRenamePlaybackDevice = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuRenameRecordingDevice = new System.Windows.Forms.ToolStripMenuItem();
+			this.mnuOpenVolumeMixerPlayback = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparatorVolMixerNotify = new System.Windows.Forms.ToolStripSeparator();
+			this.mnuOpenVolumeMixerNotify = new System.Windows.Forms.ToolStripMenuItem();
 			this.listBoxRecording = new System.Windows.Forms.ListView();
 			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -130,7 +135,9 @@
             this.toolStripSeparator2,
             this.mnuFavouritePlaybackDevice,
             this.setHotKeyToolStripMenuItem1,
-            this.mnuHidePlaybackDevice});
+            this.mnuRenamePlaybackDevice,
+            this.mnuHidePlaybackDevice,
+            this.mnuOpenVolumeMixerPlayback});
 			this.playbackStrip.Name = "contextMenuStrip1";
 			this.playbackStrip.Size = new System.Drawing.Size(246, 120);
 			this.playbackStrip.Opening += new System.ComponentModel.CancelEventHandler(this.playbackStrip_Opening);
@@ -181,6 +188,39 @@
 			this.mnuHidePlaybackDevice.Size = new System.Drawing.Size(245, 22);
 			this.mnuHidePlaybackDevice.Text = "Hide Device";
 			this.mnuHidePlaybackDevice.Click += new System.EventHandler(this.mnuHidePlaybackDevice_Click);
+			//
+			// mnuRenamePlaybackDevice
+			//
+			this.mnuRenamePlaybackDevice.Name = "mnuRenamePlaybackDevice";
+			this.mnuRenamePlaybackDevice.Size = new System.Drawing.Size(245, 22);
+			this.mnuRenamePlaybackDevice.Text = "Rename";
+			this.mnuRenamePlaybackDevice.Click += new System.EventHandler(this.mnuRenamePlaybackDevice_Click);
+			//
+			// mnuRenameRecordingDevice
+			//
+			this.mnuRenameRecordingDevice.Name = "mnuRenameRecordingDevice";
+			this.mnuRenameRecordingDevice.Size = new System.Drawing.Size(245, 22);
+			this.mnuRenameRecordingDevice.Text = "Rename";
+			this.mnuRenameRecordingDevice.Click += new System.EventHandler(this.mnuRenameRecordingDevice_Click);
+			//
+			// mnuOpenVolumeMixerPlayback
+			//
+			this.mnuOpenVolumeMixerPlayback.Name = "mnuOpenVolumeMixerPlayback";
+			this.mnuOpenVolumeMixerPlayback.Size = new System.Drawing.Size(245, 22);
+			this.mnuOpenVolumeMixerPlayback.Text = "Open Volume Mixer";
+			this.mnuOpenVolumeMixerPlayback.Click += new System.EventHandler(this.mnuOpenVolumeMixer_Click);
+			//
+			// toolStripSeparatorVolMixerNotify
+			//
+			this.toolStripSeparatorVolMixerNotify.Name = "toolStripSeparatorVolMixerNotify";
+			this.toolStripSeparatorVolMixerNotify.Size = new System.Drawing.Size(190, 6);
+			//
+			// mnuOpenVolumeMixerNotify
+			//
+			this.mnuOpenVolumeMixerNotify.Name = "mnuOpenVolumeMixerNotify";
+			this.mnuOpenVolumeMixerNotify.Size = new System.Drawing.Size(193, 22);
+			this.mnuOpenVolumeMixerNotify.Text = "Open Volume Mixer";
+			this.mnuOpenVolumeMixerNotify.Click += new System.EventHandler(this.mnuOpenVolumeMixer_Click);
 			//
 			// tabControl1
 			// 
@@ -332,6 +372,7 @@
             this.toolStripSeparator3,
             this.mnuFavouriteRecordingDevice,
             this.setHotKeyToolStripMenuItem,
+            this.mnuRenameRecordingDevice,
             this.mnuHideRecordingDevice});
 			this.recordingStrip.Name = "contextMenuStrip1";
 			this.recordingStrip.Size = new System.Drawing.Size(246, 120);
@@ -841,6 +882,8 @@
 			// 
 			this.notifyIconStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripSeparator1,
+            this.toolStripSeparatorVolMixerNotify,
+            this.mnuOpenVolumeMixerNotify,
             this.preferencesToolStripMenuItem,
             this.updateAvailableToolStripMenuItem,
             this.exitToolStripMenuItem});
@@ -1036,6 +1079,11 @@
 		private System.Windows.Forms.CheckBox chkShowUnknownDevicesInHotkeyList;
         private System.Windows.Forms.ToolStripMenuItem mnuHidePlaybackDevice;
         private System.Windows.Forms.ToolStripMenuItem mnuHideRecordingDevice;
+        private System.Windows.Forms.ToolStripMenuItem mnuRenamePlaybackDevice;
+        private System.Windows.Forms.ToolStripMenuItem mnuRenameRecordingDevice;
+        private System.Windows.Forms.ToolStripMenuItem mnuOpenVolumeMixerPlayback;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorVolMixerNotify;
+        private System.Windows.Forms.ToolStripMenuItem mnuOpenVolumeMixerNotify;
 	}
 }
 

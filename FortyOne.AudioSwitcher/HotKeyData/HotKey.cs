@@ -35,15 +35,19 @@ namespace FortyOne.AudioSwitcher.HotKeyData
         /// </summary>
         public Guid DeviceId { get; set; }
 
+        public bool IsToggle => DeviceId == Guid.Empty;
+
         public IDevice Device
         {
-            get { return AudioDeviceManager.Controller.GetDevice(DeviceId); }
+            get { return IsToggle ? null : AudioDeviceManager.Controller.GetDevice(DeviceId); }
         }
 
         public string DeviceName
         {
             get
             {
+                if (IsToggle)
+                    return "Toggle Outputs";
                 if (Device == null)
                     return "Unknown Device";
                 return Device.FullName;

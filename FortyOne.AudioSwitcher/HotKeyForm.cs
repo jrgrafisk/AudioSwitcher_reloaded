@@ -13,6 +13,12 @@ namespace FortyOne.AudioSwitcher
 
     public partial class HotKeyForm : Form
     {
+        private class ToggleOutputsItem
+        {
+            public string FullName => "Toggle Outputs";
+            public Guid Id => Guid.Empty;
+        }
+
         private readonly HotKey _hotkey;
         private readonly HotKey _linkedHotKey;
         private readonly HotKeyFormMode _mode = HotKeyFormMode.Normal;
@@ -34,6 +40,7 @@ namespace FortyOne.AudioSwitcher
                 _deviceStateFilter |= DeviceState.Unplugged;
 
             cmbDevices.Items.Clear();
+            cmbDevices.Items.Add(new ToggleOutputsItem());
             foreach (var ad in AudioDeviceManager.Controller.GetPlaybackDevices(_deviceStateFilter))
                 cmbDevices.Items.Add(ad);
 
@@ -68,7 +75,8 @@ namespace FortyOne.AudioSwitcher
 
             foreach (var o in cmbDevices.Items)
             {
-                if (((IDevice)o).Id == _hotkey.DeviceId)
+                var id = o is ToggleOutputsItem tog ? tog.Id : ((IDevice)o).Id;
+                if (id == _hotkey.DeviceId)
                 {
                     cmbDevices.SelectedIndex = cmbDevices.Items.IndexOf(o);
                     break;
@@ -150,7 +158,8 @@ namespace FortyOne.AudioSwitcher
             if (cmbDevices.SelectedItem == null)
                 return;
 
-            _hotkey.DeviceId = ((IDevice)cmbDevices.SelectedItem).Id;
+            var item = cmbDevices.SelectedItem;
+            _hotkey.DeviceId = item is ToggleOutputsItem tog ? tog.Id : ((IDevice)item).Id;
         }
 
         private void HotKeyForm_FormClosed(object sender, FormClosedEventArgs e)

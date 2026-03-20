@@ -29,6 +29,7 @@ namespace FortyOne.AudioSwitcher.Configuration
         public const string SETTING_UPDATE_NOTIFICATIONS_ENABLED = "UpdateNotificationsEnabled";
         public const string SETTING_FORCEAPPSFOLLOWDEFAULT = "ForceAppsFollowDefault";
         public const string SETTING_HIDDENDEVICES = "HiddenDevices";
+        public const string SETTING_CUSTOMDEVICENAMES = "CustomDeviceNames";
         private readonly ISettingsSource _configWriter;
 
         public ConfigurationSettings(ISettingsSource source)
@@ -252,6 +253,12 @@ namespace FortyOne.AudioSwitcher.Configuration
         {
             get { return _configWriter.Get(SETTING_HIDDENDEVICES); }
             set { _configWriter.Set(SETTING_HIDDENDEVICES, value); }
+        }
+
+        public string CustomDeviceNames
+        {
+            get { return _configWriter.Get(SETTING_CUSTOMDEVICENAMES); }
+            set { _configWriter.Set(SETTING_CUSTOMDEVICENAMES, value); }
         }
 
         public void CreateDefaults()

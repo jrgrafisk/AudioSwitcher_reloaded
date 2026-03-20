@@ -120,7 +120,7 @@ namespace FortyOne.AudioSwitcher.HotKeyData
             var filterInvalid = !Program.Settings.ShowUnknownDevicesInHotkeyList;
             IEnumerable<HotKey> hotkeyList = _hotkeys;
             if (filterInvalid)
-                hotkeyList = hotkeyList.Where(x => x.Device != null);
+                hotkeyList = hotkeyList.Where(x => x.IsToggle || x.Device != null);
             
             foreach (var k in hotkeyList)
             {
