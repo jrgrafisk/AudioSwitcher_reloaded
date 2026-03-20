@@ -42,29 +42,6 @@ namespace FortyOne.AudioSwitcher
 
             var settingsPath = Path.Combine(AppDataDirectory, Resources.ConfigFile);
 
-            //Delete the old updater
-            try
-            {
-                //v1.5 and less
-                var updaterPath = Application.StartupPath + "AutoUpdater.exe";
-                if (File.Exists(updaterPath))
-                    File.Delete(updaterPath);
-
-                //v1.6
-                updaterPath = Path.Combine(AppContext.BaseDirectory, "AutoUpdater.exe");
-                if (File.Exists(updaterPath))
-                    File.Delete(updaterPath);
-
-                //v1.6.7
-                updaterPath = Path.Combine(AppDataDirectory, "AutoUpdater.exe");
-                if (File.Exists(updaterPath))
-                    File.Delete(updaterPath);
-            }
-            catch
-            {
-                //This shouldn't prevent the application from running
-            }
-
             try
             {
                 var iniSettingsPath = Path.Combine(AppContext.BaseDirectory, Resources.OldConfigFile);
