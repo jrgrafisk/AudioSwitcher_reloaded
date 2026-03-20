@@ -13,11 +13,6 @@
     <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>fortyone.pfx</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AudioSwitcher.AudioApi" Version="4.0.0-alpha5" />
     <PackageReference Include="AudioSwitcher.AudioApi.CoreAudio" Version="4.0.0-alpha5" />
@@ -25,12 +20,5 @@
     <PackageReference Include="WindowsInput" Version="0.2.0.0" />
   </ItemGroup>
 
-  <!-- Exclude the old auto-generated SOAP proxy files that are no longer needed -->
-  <ItemGroup>
-    <None Include="Web References\AudioSwitcherService\AudioSwitcher.disco" />
-    <None Include="Web References\AudioSwitcherService\AudioSwitcher.wsdl" />
-    <None Include="Web References\AudioSwitcherService\AudioSwitcherVersionInfo.datasource" />
-    <None Include="Web References\AudioSwitcherService\Reference.map" />
-  </ItemGroup>
 
 </Project>

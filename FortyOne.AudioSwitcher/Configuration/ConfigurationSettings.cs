@@ -17,8 +17,6 @@ namespace FortyOne.AudioSwitcher.Configuration
         public const string SETTING_WINDOWHEIGHT = "WindowHeight";
         public const string SETTING_DISABLEHOTKEYS = "DisableHotKeys";
         public const string SETTING_ENABLEQUICKSWITCH = "EnableQuickSwitch";
-        public const string SETTING_CHECKFORUPDATESONSTARTUP = "CheckForUpdatesOnStartup";
-        public const string SETTING_POLLFORUPDATES = "PollForUpdates";
         public const string SETTING_STARTUPRECORDINGDEVICE = "StartupRecordingDeviceID";
         public const string SETTING_STARTUPPLAYBACKDEVICE = "StartupPlaybackDeviceID";
         public const string SETTING_DUALSWITCHMODE = "DualSwitchMode";
@@ -26,7 +24,6 @@ namespace FortyOne.AudioSwitcher.Configuration
         public const string SETTING_SHOWUNKNOWNDEVICESINHOTKEYLIST = "ShowUnknownDevicesInHotkeyList";
         public const string SETTING_SHOWDISCONNECTEDDDEVICES = "ShowDisconnectedDevices";
         public const string SETTING_SHOWDPDEVICEIICONINTRAY = "ShowDPDeviceIconInTray";
-        public const string SETTING_UPDATE_NOTIFICATIONS_ENABLED = "UpdateNotificationsEnabled";
         public const string SETTING_FORCEAPPSFOLLOWDEFAULT = "ForceAppsFollowDefault";
         public const string SETTING_HIDDENDEVICES = "HiddenDevices";
         public const string SETTING_CUSTOMDEVICENAMES = "CustomDeviceNames";
@@ -62,30 +59,6 @@ namespace FortyOne.AudioSwitcher.Configuration
                 return Guid.Empty;
             }
             set { _configWriter.Set(SETTING_STARTUPPLAYBACKDEVICE, value.ToString()); }
-        }
-
-        public int PollForUpdates
-        {
-            get
-            {
-                return
-                    Convert.ToInt32(_configWriter.Get(SETTING_POLLFORUPDATES));
-            }
-            set { _configWriter.Set(SETTING_POLLFORUPDATES, value.ToString()); }
-        }
-
-        public bool CheckForUpdatesOnStartup
-        {
-            get
-            {
-                return
-                    Convert.ToBoolean(_configWriter.Get(SETTING_CHECKFORUPDATESONSTARTUP));
-            }
-            set
-            {
-                _configWriter.Set(SETTING_CHECKFORUPDATESONSTARTUP,
-                    value.ToString());
-            }
         }
 
         public bool DualSwitchMode
@@ -233,16 +206,6 @@ namespace FortyOne.AudioSwitcher.Configuration
             set { _configWriter.Set(SETTING_ENABLEQUICKSWITCH, value.ToString()); }
         }
 
-        public bool UpdateNotificationsEnabled
-        {
-            get
-            {
-                return
-                    Convert.ToBoolean(_configWriter.Get(SETTING_UPDATE_NOTIFICATIONS_ENABLED));
-            }
-            set { _configWriter.Set(SETTING_UPDATE_NOTIFICATIONS_ENABLED, value.ToString()); }
-        }
-
         public bool ForceAppsFollowDefault
         {
             get { return Convert.ToBoolean(_configWriter.Get(SETTING_FORCEAPPSFOLLOWDEFAULT)); }
@@ -290,14 +253,6 @@ namespace FortyOne.AudioSwitcher.Configuration
             if (!SettingExists(SETTING_WINDOWWIDTH))
                 WindowWidth = 300;
 
-            if (!SettingExists(SETTING_CHECKFORUPDATESONSTARTUP))
-                CheckForUpdatesOnStartup = false;
-
-            if (!SettingExists(SETTING_POLLFORUPDATES) && CheckForUpdatesOnStartup)
-                PollForUpdates = 60;
-            else if (!SettingExists(SETTING_POLLFORUPDATES) && !CheckForUpdatesOnStartup)
-                PollForUpdates = 0;
-
             if (!SettingExists(SETTING_STARTUPPLAYBACKDEVICE))
                 StartupPlaybackDeviceID = Guid.Empty;
 
@@ -319,9 +274,6 @@ namespace FortyOne.AudioSwitcher.Configuration
             if (!SettingExists(SETTING_SHOWDPDEVICEIICONINTRAY))
                 ShowDPDeviceIconInTray = false;
 
-            if (!SettingExists(SETTING_UPDATE_NOTIFICATIONS_ENABLED))
-                UpdateNotificationsEnabled = PollForUpdates > 0;
-
             if (!SettingExists(SETTING_FORCEAPPSFOLLOWDEFAULT))
                 ForceAppsFollowDefault = false;
 
@@ -335,14 +287,12 @@ namespace FortyOne.AudioSwitcher.Configuration
         public void LoadFrom(ConfigurationSettings otherSettings)
         {
             AutoStartWithWindows = otherSettings.AutoStartWithWindows;
-            CheckForUpdatesOnStartup = otherSettings.CheckForUpdatesOnStartup;
             CloseToTray = otherSettings.CloseToTray;
             DisableHotKeys = otherSettings.DisableHotKeys;
             DualSwitchMode = otherSettings.DualSwitchMode;
             EnableQuickSwitch = otherSettings.EnableQuickSwitch;
             FavouriteDevices = otherSettings.FavouriteDevices;
             HotKeys = otherSettings.HotKeys;
-            PollForUpdates = otherSettings.PollForUpdates;
             ShowDisabledDevices = otherSettings.ShowDisabledDevices;
             ShowUnknownDevicesInHotkeyList = otherSettings.ShowUnknownDevicesInHotkeyList;
             ShowDisconnectedDevices = otherSettings.ShowDisconnectedDevices;
