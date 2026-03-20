@@ -178,13 +178,5 @@ namespace FortyOne.AudioSwitcher.Properties {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to http://services.audioswit.ch/AudioSwitcher.asmx.
-        /// </summary>
-        internal static string WebServiceURL {
-            get {
-                return ResourceManager.GetString("WebServiceURL", resourceCulture);
-            }
-        }
     }
 }
