@@ -70,9 +70,7 @@
 			this.tapSettings = new System.Windows.Forms.TabPage();
 			this.chkShowUnknownDevicesInHotkeyList = new System.Windows.Forms.CheckBox();
 			this.chkForceAppsFollowDefault = new System.Windows.Forms.CheckBox();
-			this.chkNotifyUpdates = new System.Windows.Forms.CheckBox();
 			this.chkShowDPDeviceIconInTray = new System.Windows.Forms.CheckBox();
-			this.btnCheckUpdate = new System.Windows.Forms.Button();
 			this.chkShowDisconnectedDevices = new System.Windows.Forms.CheckBox();
 			this.chkShowDiabledDevices = new System.Windows.Forms.CheckBox();
 			this.chkCloseToTray = new System.Windows.Forms.CheckBox();
@@ -103,12 +101,10 @@
 			this.notifyIconStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.updateAvailableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.memoryCleaner = new System.Windows.Forms.Timer(this.components);
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-			this.statusLabelUpdate = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.playbackStrip.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -452,9 +448,7 @@
 			// 
 			this.tapSettings.Controls.Add(this.chkForceAppsFollowDefault);
 			this.tapSettings.Controls.Add(this.chkShowUnknownDevicesInHotkeyList);
-			this.tapSettings.Controls.Add(this.chkNotifyUpdates);
 			this.tapSettings.Controls.Add(this.chkShowDPDeviceIconInTray);
-			this.tapSettings.Controls.Add(this.btnCheckUpdate);
 			this.tapSettings.Controls.Add(this.chkShowDisconnectedDevices);
 			this.tapSettings.Controls.Add(this.chkShowDiabledDevices);
 			this.tapSettings.Controls.Add(this.chkCloseToTray);
@@ -496,18 +490,6 @@
 			this.chkForceAppsFollowDefault.UseVisualStyleBackColor = true;
 			this.chkForceAppsFollowDefault.CheckedChanged += new System.EventHandler(this.chkForceAppsFollowDefault_CheckedChanged);
 			//
-			// chkNotifyUpdates
-			//
-			this.chkNotifyUpdates.AutoSize = true;
-			this.chkNotifyUpdates.Location = new System.Drawing.Point(14, 246);
-			this.chkNotifyUpdates.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.chkNotifyUpdates.Name = "chkNotifyUpdates";
-			this.chkNotifyUpdates.Size = new System.Drawing.Size(174, 17);
-			this.chkNotifyUpdates.TabIndex = 15;
-			this.chkNotifyUpdates.Text = "Tell me when there\'s an update";
-			this.chkNotifyUpdates.UseVisualStyleBackColor = true;
-			this.chkNotifyUpdates.CheckedChanged += new System.EventHandler(this.chkNotifyUpdates_CheckedChanged);
-			// 
 			// chkShowDPDeviceIconInTray
 			// 
 			this.chkShowDPDeviceIconInTray.AutoSize = true;
@@ -519,19 +501,7 @@
 			this.chkShowDPDeviceIconInTray.Text = "Show Default Playback Device icon in tray";
 			this.chkShowDPDeviceIconInTray.UseVisualStyleBackColor = true;
 			this.chkShowDPDeviceIconInTray.CheckedChanged += new System.EventHandler(this.chkShowDPDeviceIconInTray_CheckedChanged);
-			// 
-			// btnCheckUpdate
-			// 
-			this.btnCheckUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCheckUpdate.Location = new System.Drawing.Point(158, 281);
-			this.btnCheckUpdate.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.btnCheckUpdate.Name = "btnCheckUpdate";
-			this.btnCheckUpdate.Size = new System.Drawing.Size(101, 25);
-			this.btnCheckUpdate.TabIndex = 7;
-			this.btnCheckUpdate.Text = "Check for Update";
-			this.btnCheckUpdate.UseVisualStyleBackColor = true;
-			this.btnCheckUpdate.Click += new System.EventHandler(this.btnCheckUpdate_Click);
-			// 
+			//
 			// chkShowDisconnectedDevices
 			// 
 			this.chkShowDisconnectedDevices.AutoSize = true;
@@ -885,7 +855,6 @@
             this.toolStripSeparatorVolMixerNotify,
             this.mnuOpenVolumeMixerNotify,
             this.preferencesToolStripMenuItem,
-            this.updateAvailableToolStripMenuItem,
             this.exitToolStripMenuItem});
 			this.notifyIconStrip.Name = "notifyIconStrip";
 			this.notifyIconStrip.Size = new System.Drawing.Size(194, 76);
@@ -902,15 +871,7 @@
 			this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
 			this.preferencesToolStripMenuItem.Text = "Open Preferences";
 			this.preferencesToolStripMenuItem.Click += new System.EventHandler(this.preferencesToolStripMenuItem_Click);
-			// 
-			// updateAvailableToolStripMenuItem
-			// 
-			this.updateAvailableToolStripMenuItem.BackColor = System.Drawing.Color.LightGoldenrodYellow;
-			this.updateAvailableToolStripMenuItem.Name = "updateAvailableToolStripMenuItem";
-			this.updateAvailableToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-			this.updateAvailableToolStripMenuItem.Text = "New Update Available!";
-			this.updateAvailableToolStripMenuItem.Click += new System.EventHandler(this.updateAvailableToolStripMenuItem_Click);
-			// 
+			//
 			// exitToolStripMenuItem
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
@@ -927,7 +888,6 @@
 			// 
 			this.statusStrip1.BackColor = System.Drawing.SystemColors.ControlLightLight;
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusLabelUpdate,
             this.toolStripStatusLabel1});
 			this.statusStrip1.Location = new System.Drawing.Point(2, 340);
 			this.statusStrip1.Name = "statusStrip1";
@@ -935,20 +895,7 @@
 			this.statusStrip1.Size = new System.Drawing.Size(272, 22);
 			this.statusStrip1.TabIndex = 3;
 			this.statusStrip1.Text = "statusStrip1";
-			// 
-			// statusLabelUpdate
-			// 
-			this.statusLabelUpdate.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.statusLabelUpdate.Font = new System.Drawing.Font("Segoe UI", 9F);
-			this.statusLabelUpdate.IsLink = true;
-			this.statusLabelUpdate.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-			this.statusLabelUpdate.LinkColor = System.Drawing.Color.Red;
-			this.statusLabelUpdate.Margin = new System.Windows.Forms.Padding(0, 0, 0, 2);
-			this.statusLabelUpdate.Name = "statusLabelUpdate";
-			this.statusLabelUpdate.Size = new System.Drawing.Size(99, 20);
-			this.statusLabelUpdate.Text = "Update Available!";
-			this.statusLabelUpdate.Click += new System.EventHandler(this.statusLabelUpdate_Click);
-			// 
+			//
 			// toolStripStatusLabel1
 			// 
 			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
@@ -1058,7 +1005,6 @@
         private System.Windows.Forms.Button btnEditHotKey;
         private System.Windows.Forms.Button btnAddHotKey;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button btnCheckUpdate;
         private System.Windows.Forms.CheckBox chkShowDisconnectedDevices;
         private System.Windows.Forms.CheckBox chkShowDiabledDevices;
         private System.Windows.Forms.ToolTip toolTip1;
@@ -1067,13 +1013,10 @@
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
         private System.Windows.Forms.Button btnClearAll;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabelUpdate;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.DataGridViewTextBoxColumn deviceNameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn hotKeyStringDataGridViewTextBoxColumn;
-        private System.Windows.Forms.ToolStripMenuItem updateAvailableToolStripMenuItem;
         private System.Windows.Forms.CheckBox chkForceAppsFollowDefault;
-        private System.Windows.Forms.CheckBox chkNotifyUpdates;
         private System.Windows.Forms.PictureBox openControlPanelPlayback;
         private System.Windows.Forms.PictureBox openControlPanelRecording;
 		private System.Windows.Forms.CheckBox chkShowUnknownDevicesInHotkeyList;

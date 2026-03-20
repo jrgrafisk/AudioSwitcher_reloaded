@@ -10,13 +10,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.Observables;
-using FortyOne.AudioSwitcher.AudioSwitcherService;
 using FortyOne.AudioSwitcher.Configuration;
-using FortyOne.AudioSwitcher.Helpers;
 using FortyOne.AudioSwitcher.HotKeyData;
 using FortyOne.AudioSwitcher.Properties;
 
@@ -60,8 +57,6 @@ namespace FortyOne.AudioSwitcher
         private bool _doubleClickHappened;
         private bool _firstStart = true;
         private int _konamiIndex = 0;
-        private AudioSwitcherVersionInfo _retrievedVersion;
-        private bool _updateAvailable;
         public bool DisableHotKeyFunction = false;
 
         public AudioSwitcher()
@@ -90,9 +85,6 @@ namespace FortyOne.AudioSwitcher
 
             HotKeyManager.HotKeyPressed += HotKeyManager_HotKeyPressed;
             hotKeyBindingSource.DataSource = HotKeyManager.HotKeys;
-
-            //Heartbeat
-            Task.Factory.StartNew(CheckForNewVersion);
 
             MinimizeFootprint();
         }
@@ -275,49 +267,6 @@ namespace FortyOne.AudioSwitcher
                 RefreshPlaybackDevices();
                 RefreshRecordingDevices();
             }));
-        }
-
-        private void CheckForNewVersion()
-        {
-            statusLabelUpdate.Visible = false;
-
-            using (var client = ConnectionHelper.GetAudioSwitcherProxy())
-            {
-                if (client == null)
-                    return;
-
-                _retrievedVersion = client.GetUpdateInfo(AssemblyVersion);
-
-                if (_retrievedVersion != null && !string.IsNullOrEmpty(_retrievedVersion.URL))
-                {
-                    _updateAvailable = true;
-                    statusLabelUpdate.Visible = true;
-                    statusLabelUpdate.ToolTipText = "New Version Available - " + _retrievedVersion.VersionInfo;
-
-                    BeginInvoke(new Action(RefreshNotifyIconItems));
-
-                    if (Program.Settings.UpdateNotificationsEnabled)
-                        ShowUpdateNotification(_retrievedVersion);
-                }
-            }
-        }
-
-        private void ShowUpdateNotification(AudioSwitcherVersionInfo retrievedVersion)
-        {
-            if (InvokeRequired)
-            {
-                BeginInvoke(new Action(() => ShowUpdateNotification(retrievedVersion)));
-                return;
-            }
-
-            notifyIcon1.BalloonTipText = "Click here to update to " + retrievedVersion.VersionInfo;
-            notifyIcon1.BalloonTipTitle = "Audio Switcher Update";
-            notifyIcon1.BalloonTipClicked += (s, e) =>
-            {
-                ShowUpdateForm();
-            };
-
-            notifyIcon1.ShowBalloonTip(3000);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -530,26 +479,6 @@ namespace FortyOne.AudioSwitcher
             RefreshRecordingDropDownButton();
         }
 
-        private void btnCheckUpdate_Click(object sender, EventArgs e)
-        {
-            using (var client = ConnectionHelper.GetAudioSwitcherProxy())
-            {
-                if (client == null)
-                    return;
-
-                var vi = client.GetUpdateInfo(AssemblyVersion);
-                if (vi != null && !string.IsNullOrEmpty(vi.URL))
-                {
-                    var udf = new UpdateForm(vi);
-                    udf.ShowDialog(this);
-                }
-                else
-                {
-                    MessageBox.Show(this, "You have the latest version!");
-                }
-            }
-        }
-
         private void setHotKeyToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             if (SelectedPlaybackDevice == null)
@@ -756,7 +685,6 @@ namespace FortyOne.AudioSwitcher
             chkDisableHotKeys.Checked = Program.Settings.DisableHotKeys;
             chkQuickSwitch.Checked = Program.Settings.EnableQuickSwitch;
             chkDualSwitchMode.Checked = Program.Settings.DualSwitchMode;
-            chkNotifyUpdates.Checked = Program.Settings.UpdateNotificationsEnabled;
 
             chkShowDiabledDevices.Checked = Program.Settings.ShowDisabledDevices;
 	        chkShowUnknownDevicesInHotkeyList.Checked = Program.Settings.ShowUnknownDevicesInHotkeyList;
@@ -1046,9 +974,6 @@ namespace FortyOne.AudioSwitcher
             notifyIconStrip.Items.Add(toolStripSeparatorVolMixerNotify);
             notifyIconStrip.Items.Add(mnuOpenVolumeMixerNotify);
             notifyIconStrip.Items.Add(preferencesToolStripMenuItem);
-
-            if (_updateAvailable)
-                notifyIconStrip.Items.Add(updateAvailableToolStripMenuItem);
 
             notifyIconStrip.Items.Add(exitToolStripMenuItem);
 
@@ -1347,32 +1272,6 @@ namespace FortyOne.AudioSwitcher
         {
             Program.Settings.WindowWidth = Width;
             Program.Settings.WindowHeight = Height;
-        }
-
-        private void statusLabelUpdate_Click(object sender, EventArgs e)
-        {
-            ShowUpdateForm();
-        }
-
-        private void ShowUpdateForm(bool topMost = false)
-        {
-            if (_retrievedVersion == null)
-                return;
-
-            var udf = new UpdateForm(_retrievedVersion);
-            udf.TopMost = topMost;
-            udf.ShowDialog(this);
-        }
-
-
-        private void updateAvailableToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ShowUpdateForm(true);
-        }
-
-        private void chkNotifyUpdates_CheckedChanged(object sender, EventArgs e)
-        {
-            Program.Settings.UpdateNotificationsEnabled = chkNotifyUpdates.Checked;
         }
 
         private void chkForceAppsFollowDefault_CheckedChanged(object sender, EventArgs e)
