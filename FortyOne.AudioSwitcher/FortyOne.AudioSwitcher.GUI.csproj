@@ -13,11 +13,6 @@
     <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>fortyone.pfx</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AudioSwitcher.AudioApi" Version="4.0.0-alpha5" />
     <PackageReference Include="AudioSwitcher.AudioApi.CoreAudio" Version="4.0.0-alpha5" />
