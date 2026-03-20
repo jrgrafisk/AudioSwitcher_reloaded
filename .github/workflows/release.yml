@@ -39,6 +39,38 @@ jobs:
           -p:GenerateAssemblyInfo=false
           -o publish/AudioSwitcher
 
+      - name: Upload unsigned artifact for signing
+        id: upload-unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-exe
+          path: publish/AudioSwitcher/AudioSwitcher.exe
+
+      # ---------------------------------------------------------------
+      # SignPath Foundation — free OSS code signing
+      # Apply at https://signpath.org and install the SignPath GitHub App.
+      # Then add the following secret to your repo:
+      #   SIGNPATH_API_TOKEN  — API token from your SignPath organization
+      # And fill in the three placeholder values below:
+      #   <your-organization-id>      — found in SignPath dashboard URL
+      #   <your-project-slug>         — slug you chose when creating the project
+      #   <your-signing-policy-slug>  — e.g. "release-signing"
+      # ---------------------------------------------------------------
+      - name: Sign with SignPath Foundation
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '<your-organization-id>'
+          project-slug: '<your-project-slug>'
+          signing-policy-slug: '<your-signing-policy-slug>'
+          github-artifact-id: '${{ steps.upload-unsigned.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: publish/signed
+
+      - name: Replace unsigned exe with signed exe
+        shell: pwsh
+        run: |
+          Copy-Item publish/signed/AudioSwitcher.exe publish/AudioSwitcher/AudioSwitcher.exe -Force
 
       - name: Determine release tag
         id: tag
