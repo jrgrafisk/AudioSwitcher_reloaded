@@ -2,16 +2,16 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace FocusGuard
+namespace FocusShield
 {
     /// <summary>
     /// Invisible message window that owns the tray icon and receives shell hook messages.
     /// </summary>
-    internal class FocusGuardForm : Form
+    internal class FocusShieldForm : Form
     {
         // ─── singleton ───────────────────────────────────────────────────────────
-        private static FocusGuardForm _instance;
-        public static FocusGuardForm Instance => _instance ??= new FocusGuardForm();
+        private static FocusShieldForm _instance;
+        public static FocusShieldForm Instance => _instance ??= new FocusShieldForm();
 
         // ─── tray ────────────────────────────────────────────────────────────────
         public bool TrayIconVisible
@@ -37,7 +37,7 @@ namespace FocusGuard
         private readonly System.Windows.Forms.Timer _resetTimer;
 
         // ─── ctor ────────────────────────────────────────────────────────────────
-        private FocusGuardForm()
+        private FocusShieldForm()
         {
             // Make the form invisible and excluded from Alt+Tab / taskbar
             FormBorderStyle = FormBorderStyle.None;
@@ -64,7 +64,7 @@ namespace FocusGuard
             _trayIcon = new NotifyIcon
             {
                 Icon             = _iconActive,
-                Text             = "FocusGuard — protecting focus",
+                Text             = "FocusShield \u2014 protecting focus",
                 Visible          = true,
                 ContextMenuStrip = _menu
             };
@@ -77,8 +77,8 @@ namespace FocusGuard
                 RefreshTrayIcon();
             };
 
-            Load         += OnLoad;
-            FormClosing  += OnFormClosing;
+            Load        += OnLoad;
+            FormClosing += OnFormClosing;
         }
 
         // ─── lifecycle ───────────────────────────────────────────────────────────
@@ -92,9 +92,7 @@ namespace FocusGuard
                 NativeMethods.SPI_GETFOREGROUNDLOCKTIMEOUT, 0, ref _originalTimeout, 0);
 
             // Raise it high so Windows itself blocks focus steals
-            NativeMethods.SystemParametersInfo(
-                NativeMethods.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, 30_000u,
-                NativeMethods.SPIF_SENDCHANGE);
+            ApplyLockTimeout(30_000u);
 
             // Register this window to receive WM_SHELLHOOKMESSAGE notifications
             _shellMsg = NativeMethods.RegisterWindowMessage("SHELLHOOK");
@@ -106,9 +104,7 @@ namespace FocusGuard
             NativeMethods.DeregisterShellHookWindow(Handle);
 
             // Restore the original timeout
-            NativeMethods.SystemParametersInfo(
-                NativeMethods.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, _originalTimeout,
-                NativeMethods.SPIF_SENDCHANGE);
+            ApplyLockTimeout(_originalTimeout);
 
             _trayIcon.Visible = false;
             _trayIcon.Dispose();
@@ -126,7 +122,7 @@ namespace FocusGuard
 
                 if (code == NativeMethods.HSHELL_WINDOWACTIVATED && _enabled)
                 {
-                    // User-initiated activation: remember this window
+                    // Normal (user-initiated) activation: remember this window
                     if (m.LParam != IntPtr.Zero)
                         _lastUserForeground = m.LParam;
                 }
@@ -152,7 +148,7 @@ namespace FocusGuard
 
             // 2. Return focus to whatever the user was doing
             if (_lastUserForeground != IntPtr.Zero && _lastUserForeground != rudeHwnd)
-                NativeMethods.SetForegroundWindow(_lastUserForeground);
+                NativeMethods.ForceForeground(_lastUserForeground);
 
             // 3. Update tray to amber + balloon
             string title = NativeMethods.GetWindowTitle(rudeHwnd);
@@ -162,8 +158,8 @@ namespace FocusGuard
             _trayIcon.Text = TruncateTip($"Blocked: {label}");
             _trayIcon.ShowBalloonTip(
                 timeout: 3000,
-                tipTitle: "FocusGuard blocked a pop-up",
-                tipText:  $"{label} wants your attention — click its taskbar button when ready.",
+                tipTitle: "FocusShield blocked a pop-up",
+                tipText:  $"{label} wants your attention \u2014 click its taskbar button when ready.",
                 tipIcon:  ToolTipIcon.Info);
 
             _resetTimer.Stop();
@@ -176,36 +172,31 @@ namespace FocusGuard
             _enabled = !_enabled;
             _menuEnabled.Checked = _enabled;
 
-            if (_enabled)
-            {
-                NativeMethods.SystemParametersInfo(
-                    NativeMethods.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, 30_000u,
-                    NativeMethods.SPIF_SENDCHANGE);
-            }
-            else
-            {
-                NativeMethods.SystemParametersInfo(
-                    NativeMethods.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, _originalTimeout,
-                    NativeMethods.SPIF_SENDCHANGE);
-            }
-
+            ApplyLockTimeout(_enabled ? 30_000u : _originalTimeout);
             RefreshTrayIcon();
         }
 
         private void OnExit(object sender, EventArgs e) => Application.Exit();
 
         // ─── helpers ─────────────────────────────────────────────────────────────
+        private static void ApplyLockTimeout(uint ms)
+        {
+            NativeMethods.SystemParametersInfo(
+                NativeMethods.SPI_SETFOREGROUNDLOCKTIMEOUT, 0,
+                (IntPtr)ms, NativeMethods.SPIF_SENDCHANGE);
+        }
+
         private void RefreshTrayIcon()
         {
             _trayIcon.Icon = _enabled ? _iconActive : _iconPaused;
             _trayIcon.Text = _enabled
-                ? "FocusGuard — protecting focus"
-                : "FocusGuard — paused";
+                ? "FocusShield \u2014 protecting focus"
+                : "FocusShield \u2014 paused";
         }
 
         // NotifyIcon.Text has a 64-char limit
         private static string TruncateTip(string s) =>
-            s.Length > 63 ? s.Substring(0, 60) + "…" : s;
+            s.Length > 63 ? s.Substring(0, 60) + "\u2026" : s;
 
         // Exclude from Alt+Tab switcher
         protected override CreateParams CreateParams

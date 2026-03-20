@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace FocusGuard
+namespace FocusShield
 {
     internal static class Program
     {
@@ -10,19 +10,19 @@ namespace FocusGuard
         private static void Main()
         {
             // Single-instance guard
-            using var mutex = new Mutex(true, "FocusGuard_SingleInstance", out bool first);
+            using var mutex = new Mutex(true, "FocusShield_SingleInstance", out bool first);
             if (!first)
             {
                 MessageBox.Show(
-                    "FocusGuard is already running.\nCheck your system tray.",
-                    "FocusGuard", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    "FocusShield is already running.\nCheck your system tray.",
+                    "FocusShield", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             if (Environment.OSVersion.Version.Major < 6)
             {
                 MessageBox.Show(
-                    "FocusGuard requires Windows Vista or later.",
+                    "FocusShield requires Windows Vista or later.",
                     "Unsupported OS", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -31,9 +31,9 @@ namespace FocusGuard
             Application.SetCompatibleTextRenderingDefault(false);
 
             Application.ApplicationExit += (_, _) =>
-                FocusGuardForm.Instance.TrayIconVisible = false;
+                FocusShieldForm.Instance.TrayIconVisible = false;
 
-            Application.Run(FocusGuardForm.Instance);
+            Application.Run(FocusShieldForm.Instance);
         }
     }
 }

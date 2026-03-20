@@ -4,8 +4,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyName>FocusGuard</AssemblyName>
-    <RootNamespace>FocusGuard</RootNamespace>
+    <AssemblyName>FocusShield</AssemblyName>
+    <RootNamespace>FocusShield</RootNamespace>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>

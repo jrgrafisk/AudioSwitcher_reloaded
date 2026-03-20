@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace FocusGuard
+namespace FocusShield
 {
     // Generates tray icons programmatically — no embedded resources needed.
     internal static class IconRenderer
@@ -17,7 +17,7 @@ namespace FocusGuard
 
         private static Icon BuildShield(Color fill, Color shadow)
         {
-            // 16×16 shield polygon
+            // 16x16 shield polygon
             var pts = new PointF[]
             {
                 new(2f,  1f),
@@ -33,8 +33,8 @@ namespace FocusGuard
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.Clear(Color.Transparent);
 
-                using var fillBrush   = new SolidBrush(fill);
-                using var borderPen   = new Pen(shadow, 1.2f);
+                using var fillBrush    = new SolidBrush(fill);
+                using var borderPen    = new Pen(shadow, 1.2f);
                 using var highlightPen = new Pen(Color.FromArgb(120, 255, 255, 255), 0.8f);
 
                 g.FillPolygon(fillBrush, pts);
@@ -46,8 +46,11 @@ namespace FocusGuard
 
             IntPtr hIcon = bmp.GetHicon();
             var icon = (Icon)Icon.FromHandle(hIcon).Clone(); // clone so we own the data
-            NativeMethods.DestroyIcon(hIcon);
+            DestroyIcon(hIcon);
             return icon;
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool DestroyIcon(IntPtr hIcon);
     }
 }

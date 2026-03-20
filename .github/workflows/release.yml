@@ -39,19 +39,19 @@ jobs:
           -p:GenerateAssemblyInfo=false
           -o publish/AudioSwitcher
 
-      - name: Restore FocusGuard dependencies
-        run: dotnet restore FocusGuard/FocusGuard.csproj
+      - name: Restore FocusShield dependencies
+        run: dotnet restore FocusShield/FocusShield.csproj
 
-      - name: Publish FocusGuard (single-file)
+      - name: Publish FocusShield (single-file)
         run: >
-          dotnet publish FocusGuard/FocusGuard.csproj
+          dotnet publish FocusShield/FocusShield.csproj
           -c Release
           -r win-x64
           --self-contained true
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:GenerateAssemblyInfo=false
-          -o publish/FocusGuard
+          -o publish/FocusShield
 
       - name: Upload unsigned artifacts for signing
         id: upload-unsigned
@@ -60,7 +60,7 @@ jobs:
           name: unsigned-exe
           path: |
             publish/AudioSwitcher/AudioSwitcher.exe
-            publish/FocusGuard/FocusGuard.exe
+            publish/FocusShield/FocusShield.exe
 
       # ---------------------------------------------------------------
       # SignPath Foundation — free OSS code signing
@@ -87,7 +87,7 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item publish/signed/AudioSwitcher.exe publish/AudioSwitcher/AudioSwitcher.exe -Force
-          Copy-Item publish/signed/FocusGuard.exe    publish/FocusGuard/FocusGuard.exe       -Force
+          Copy-Item publish/signed/FocusShield.exe   publish/FocusShield/FocusShield.exe     -Force
 
       - name: Determine release tag
         id: tag
@@ -103,7 +103,7 @@ jobs:
         shell: pwsh
         run: |
           Compress-Archive -Path publish/AudioSwitcher/* -DestinationPath AudioSwitcher-${{ steps.tag.outputs.value }}-win-x86.zip
-          Compress-Archive -Path publish/FocusGuard/*    -DestinationPath FocusGuard-${{ steps.tag.outputs.value }}-win-x64.zip
+          Compress-Archive -Path publish/FocusShield/*   -DestinationPath FocusShield-${{ steps.tag.outputs.value }}-win-x64.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -114,7 +114,7 @@ jobs:
           prerelease: false
           files: |
             AudioSwitcher-${{ steps.tag.outputs.value }}-win-x86.zip
-            FocusGuard-${{ steps.tag.outputs.value }}-win-x64.zip
+            FocusShield-${{ steps.tag.outputs.value }}-win-x64.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
