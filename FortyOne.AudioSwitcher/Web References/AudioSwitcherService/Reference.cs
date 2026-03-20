@@ -1,12 +1,10 @@
-// This file replaces the legacy auto-generated SOAP proxy.
-// The service client now uses HttpClient to communicate with the SOAP endpoint.
+// GitHub Releases update client.
+// Replaces the legacy SOAP proxy (audioswit.ch) with the GitHub releases API.
 
 using System;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace FortyOne.AudioSwitcher.AudioSwitcherService
 {
@@ -19,38 +17,30 @@ namespace FortyOne.AudioSwitcher.AudioSwitcherService
 
     public sealed class AudioSwitcherClient : IDisposable
     {
+        private const string GitHubApiUrl =
+            "https://api.github.com/repos/jrgrafisk/AudioSwitcher_v1/releases/latest";
+
         private static readonly HttpClient _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromSeconds(15)
         };
 
-        private readonly string _serviceUrl;
-
-        public AudioSwitcherClient(string serviceUrl)
+        static AudioSwitcherClient()
         {
-            _serviceUrl = serviceUrl;
+            // GitHub API requires a User-Agent header.
+            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
+                _httpClient.DefaultRequestHeaders.Add("User-Agent", "AudioSwitcher");
+
+            // Ask GitHub for JSON back.
+            if (!_httpClient.DefaultRequestHeaders.Contains("Accept"))
+                _httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
         }
 
-        public string CheckForUpdate(string assemblyVersion)
-        {
-            return CheckForUpdateAsync(assemblyVersion).GetAwaiter().GetResult();
-        }
-
-        public async Task<string> CheckForUpdateAsync(string assemblyVersion)
-        {
-            var envelope = BuildEnvelope("CheckForUpdate",
-                $"<assemblyVersion>{assemblyVersion}</assemblyVersion>");
-
-            var content = CreateSoapContent(envelope, "http://tempuri.org/CheckForUpdate");
-            var response = await _httpClient.PostAsync(_serviceUrl, content).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            var xml = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var doc = XDocument.Parse(xml);
-            XNamespace ns = "http://tempuri.org/";
-            return doc.Descendants(ns + "CheckForUpdateResult").FirstOrDefault()?.Value;
-        }
-
+        /// <summary>
+        /// Fetches the latest GitHub release and returns version info if a newer
+        /// version than <paramref name="assemblyVersion"/> is available.
+        /// Returns null if already up-to-date or on any error.
+        /// </summary>
         public AudioSwitcherVersionInfo GetUpdateInfo(string assemblyVersion)
         {
             return GetUpdateInfoAsync(assemblyVersion).GetAwaiter().GetResult();
@@ -58,86 +48,95 @@ namespace FortyOne.AudioSwitcher.AudioSwitcherService
 
         public async Task<AudioSwitcherVersionInfo> GetUpdateInfoAsync(string assemblyVersion)
         {
-            var envelope = BuildEnvelope("GetUpdateInfo",
-                $"<assemblyVersion>{assemblyVersion}</assemblyVersion>");
-
-            var content = CreateSoapContent(envelope, "http://tempuri.org/GetUpdateInfo");
-            var response = await _httpClient.PostAsync(_serviceUrl, content).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            var xml = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var doc = XDocument.Parse(xml);
-            XNamespace ns = "http://tempuri.org/";
-            var result = doc.Descendants(ns + "GetUpdateInfoResult").FirstOrDefault();
-            if (result == null)
-                return null;
-
-            return new AudioSwitcherVersionInfo
+            try
             {
-                VersionInfo = result.Element("VersionInfo")?.Value,
-                URL = result.Element("URL")?.Value,
-                ChangeLog = result.Element("ChangeLog")?.Value
-            };
+                var json = await _httpClient.GetStringAsync(GitHubApiUrl).ConfigureAwait(false);
+
+                var tagName   = ParseJsonString(json, "tag_name");
+                var htmlUrl   = ParseJsonString(json, "html_url");
+                var body      = ParseJsonString(json, "body");
+
+                if (string.IsNullOrEmpty(tagName) || string.IsNullOrEmpty(htmlUrl))
+                    return null;
+
+                if (!IsNewer(tagName, assemblyVersion))
+                    return null;
+
+                return new AudioSwitcherVersionInfo
+                {
+                    VersionInfo = tagName.TrimStart('v', 'V'),
+                    URL         = htmlUrl,
+                    ChangeLog   = body ?? ""
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public string SendBugReport(string confirmation, string userComment, string details, string stackTrace)
+        /// <summary>
+        /// Returns the release page URL if an update is available, null otherwise.
+        /// </summary>
+        public string CheckForUpdate(string assemblyVersion)
         {
-            return SendBugReportAsync(confirmation, userComment, details, stackTrace).GetAwaiter().GetResult();
+            return CheckForUpdateAsync(assemblyVersion).GetAwaiter().GetResult();
         }
 
-        public async Task<string> SendBugReportAsync(string confirmation, string userComment, string details, string stackTrace)
+        public async Task<string> CheckForUpdateAsync(string assemblyVersion)
         {
-            var body = $"<confirmation>{EscapeXml(confirmation)}</confirmation>" +
-                       $"<userComment>{EscapeXml(userComment)}</userComment>" +
-                       $"<details>{EscapeXml(details)}</details>" +
-                       $"<stackTrace>{EscapeXml(stackTrace)}</stackTrace>";
-
-            var envelope = BuildEnvelope("SendBugReport", body);
-            var content = CreateSoapContent(envelope, "http://tempuri.org/SendBugReport");
-            var response = await _httpClient.PostAsync(_serviceUrl, content).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            var xml = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var doc = XDocument.Parse(xml);
-            XNamespace ns = "http://tempuri.org/";
-            return doc.Descendants(ns + "SendBugReportResult").FirstOrDefault()?.Value ?? "";
+            var info = await GetUpdateInfoAsync(assemblyVersion).ConfigureAwait(false);
+            return info?.URL;
         }
 
-        private static string BuildEnvelope(string operation, string innerXml)
+        // ── helpers ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Returns true if <paramref name="githubTag"/> represents a version
+        /// strictly newer than <paramref name="assemblyVersion"/>.
+        /// </summary>
+        private static bool IsNewer(string githubTag, string assemblyVersion)
         {
-            return $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<soap:Envelope xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
-               xmlns:xsd=""http://www.w3.org/2001/XMLSchema""
-               xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"">
-  <soap:Body>
-    <{operation} xmlns=""http://tempuri.org/"">
-      {innerXml}
-    </{operation}>
-  </soap:Body>
-</soap:Envelope>";
+            // Strip leading 'v' or 'V' from tag (e.g. "v1.2.3" → "1.2.3")
+            var tagVersion = githubTag.TrimStart('v', 'V');
+
+            if (!Version.TryParse(tagVersion, out Version latest))
+                return false;
+
+            // AssemblyVersion may be "1.2.3.4" — normalise to three parts for comparison.
+            var normalized = NormalizeVersion(assemblyVersion);
+            if (!Version.TryParse(normalized, out Version current))
+                return false;
+
+            return latest > current;
         }
 
-        private static StringContent CreateSoapContent(string envelope, string soapAction)
+        /// <summary>
+        /// Trims a version string to at most three components so it can be
+        /// compared with a typical GitHub semver tag (major.minor.patch).
+        /// </summary>
+        private static string NormalizeVersion(string version)
         {
-            var content = new StringContent(envelope, Encoding.UTF8, "text/xml");
-            content.Headers.Add("SOAPAction", $"\"{soapAction}\"");
-            return content;
+            if (string.IsNullOrEmpty(version)) return "0.0.0";
+            var parts = version.Split('.');
+            var take = Math.Min(parts.Length, 3);
+            return string.Join(".", parts, 0, take);
         }
 
-        private static string EscapeXml(string value)
+        /// <summary>
+        /// Extracts a simple JSON string value by key using regex.
+        /// Handles basic JSON escape sequences.
+        /// </summary>
+        private static string ParseJsonString(string json, string key)
         {
-            if (value == null) return string.Empty;
-            return value
-                .Replace("&", "&amp;")
-                .Replace("<", "&lt;")
-                .Replace(">", "&gt;")
-                .Replace("\"", "&quot;")
-                .Replace("'", "&apos;");
+            // Matches: "key": "value"  (value may contain \" escapes and \n etc.)
+            var pattern = "\"" + Regex.Escape(key) + "\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"";
+            var m = Regex.Match(json, pattern, RegexOptions.Singleline);
+            if (!m.Success) return null;
+
+            return Regex.Unescape(m.Groups[1].Value);
         }
 
-        public void Dispose()
-        {
-            // HttpClient is shared/static; nothing to dispose here.
-        }
+        public void Dispose() { }
     }
 }

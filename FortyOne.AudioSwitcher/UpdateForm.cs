@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
 using FortyOne.AudioSwitcher.AudioSwitcherService;
 using FortyOne.AudioSwitcher.Helpers;
-using FortyOne.AudioSwitcher.Properties;
 
 namespace FortyOne.AudioSwitcher
 {
@@ -19,10 +16,7 @@ namespace FortyOne.AudioSwitcher
             InitializeComponent();
             using (var client = ConnectionHelper.GetAudioSwitcherProxy())
             {
-                if (client == null)
-                    return;
-
-                url = client.CheckForUpdate(AudioSwitcher.Instance.AssemblyVersion);
+                url = client.CheckForUpdate(AudioSwitcher.Instance.AssemblyVersion) ?? "";
             }
         }
 
@@ -46,20 +40,9 @@ namespace FortyOne.AudioSwitcher
 
         private void btnUpdateNow_Click(object sender, EventArgs e)
         {
-            try
-            {
-                var updaterPath = Path.Combine(Program.AppDataDirectory, "AutoUpdater.exe");
-
-                if (!File.Exists(updaterPath))
-                    File.WriteAllBytes(updaterPath, Resources.AutoUpdater);
-
-                Process.Start(updaterPath, Process.GetCurrentProcess().Id + " \"" + Environment.ProcessPath + "\"");
-                Application.Exit();
-            }
-            catch
-            {
-                MessageBox.Show(this, "Cannot Update Automatically.\r\nPlease manually download update.");
-            }
+            if (!string.IsNullOrEmpty(url))
+                Process.Start(url);
+            Close();
         }
 
         private void label3_Click(object sender, EventArgs e)
