@@ -791,7 +791,7 @@
 			this.linkLabel1.Size = new System.Drawing.Size(200, 13);
 			this.linkLabel1.TabIndex = 12;
 			this.linkLabel1.TabStop = true;
-			this.linkLabel1.Text = "github.com/jrgrafisk/AudioSwitcher_v1/releases";
+			this.linkLabel1.Text = "github.com/jrgrafisk/AudioSwitcher_reloaded/releases";
 			this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
 			// 
 			// btnTestError
